@@ -31,11 +31,13 @@ Thumbs.db
 */corpus/images/
 *.png
 
-# Local ONNX checkpoints — re-vendor with scripts/vendor_image.sh (MODELS=include).
-# Exceeds GitHub's 100 MB push limit; lives in source repo for reproducibility.
+# Local ONNX checkpoints — exceed GitHub's 100 MB push limit; live in
+# the private companion repo for reproducibility.
 image/models/*.onnx
 !image/templates/**/*.png
 !docs/**/*.png
+# Sample-corpus PNGs are part of the public bundle (only ~2.7 MB total).
+!image/corpus/sample/images/**/*.png
 
 # Predictions (regenerated per run)
 **/_predictions/
