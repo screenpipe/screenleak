@@ -1,0 +1,36 @@
+{"id": "person_017", "app": "Messages", "window": "Aleksandr Volkov", "pii": [{"text": "Aleksandr Volkov", "label": "private_person"}], "notes": "Russian name"}
+{"id": "person_013", "app": "Messages", "window": "Maria Cruz Lopez", "pii": [{"text": "Maria Cruz Lopez", "label": "private_person"}], "notes": "three-part name"}
+{"id": "person_010", "app": "Slack", "window": "DM: aidenpark", "pii": [{"text": "aidenpark", "label": "private_person"}], "notes": "username form in Slack DM"}
+{"id": "email_008", "app": "Arc", "window": "priya.shah@kepler-labs.com - Calendar", "pii": [{"text": "priya.shah@kepler-labs.com", "label": "private_email"}], "notes": "email at start of calendar tab"}
+{"id": "email_009", "app": "Discord", "window": "DMs - aiden@atlas.io", "pii": [{"text": "aiden@atlas.io", "label": "private_email"}], "notes": "email in Discord DM list"}
+{"id": "email_004", "app": "Slack", "window": "DM: aiden@atlas.io", "pii": [{"text": "aiden@atlas.io", "label": "private_email"}], "notes": "email as DM identifier"}
+{"id": "phone_004", "app": "Arc", "window": "Verify number 4155550123", "pii": [{"text": "4155550123", "label": "private_phone"}], "notes": "raw 10 digits — context confirms phone"}
+{"id": "phone_008", "app": "Arc", "window": "(415) 555-0123 ext. 1234", "pii": [{"text": "(415) 555-0123 ext. 1234", "label": "private_phone"}], "notes": "with extension"}
+{"id": "phone_001", "app": "Arc", "window": "Contact - (415) 555-0123 - Profile", "pii": [{"text": "(415) 555-0123", "label": "private_phone"}], "notes": "US format with parens and dash"}
+{"id": "address_006", "app": "Calendar", "window": "Meet at 500 Market St, Apt 12B, SF, CA 94104", "pii": [{"text": "500 Market St, Apt 12B, SF, CA 94104", "label": "private_address"}], "notes": "address with apartment number — abbreviated state"}
+{"id": "address_008", "app": "Arc", "window": "Aiden Park - 123 Main St, Boston - Contacts", "pii": [{"text": "Aiden Park", "label": "private_person"}, {"text": "123 Main St, Boston", "label": "private_address"}], "notes": "name + partial address (no ZIP)"}
+{"id": "address_007", "app": "Arc", "window": "4-2-1 Akasaka, Minato City, Tokyo 107-0052", "pii": [{"text": "4-2-1 Akasaka, Minato City, Tokyo 107-0052", "label": "private_address"}], "notes": "Japanese-style address"}
+{"id": "url_005", "app": "Mail", "window": "Click to verify: https://acme.com/verify/token-abc-xyz", "pii": [{"text": "https://acme.com/verify/token-abc-xyz", "label": "private_url"}], "notes": "magic link with verification token"}
+{"id": "url_009", "app": "Arc", "window": "https://discord.gg/abc123 - Discord", "pii": [{"text": "https://discord.gg/abc123", "label": "private_url"}], "notes": "Discord invite link"}
+{"id": "url_007", "app": "Arc", "window": "https://calendly.com/jane-doe/30min", "pii": [{"text": "https://calendly.com/jane-doe/30min", "label": "private_url"}], "notes": "Calendly link reveals identity in slug"}
+{"id": "company_001", "app": "Arc", "window": "Dashboard - Acme, LLC - Stripe", "pii": [{"text": "Acme, LLC", "label": "private_company"}], "notes": "LLC suffix in Stripe dashboard pattern"}
+{"id": "company_008", "app": "Slack", "window": "Settings - Orion Networks - Slack", "pii": [{"text": "Orion Networks", "label": "private_company"}], "notes": "co name in Slack workspace context"}
+{"id": "company_016", "app": "Arc", "window": "Helios AI · Senior Engineer · Open roles", "pii": [{"text": "Helios AI", "label": "private_company"}], "notes": "co name in jobs listing"}
+{"id": "repo_007", "app": "Cursor", "window": "src/index.ts — kepler-labs/timer-service", "pii": [{"text": "kepler-labs/timer-service", "label": "private_repo"}], "notes": "IDE tab format"}
+{"id": "repo_008", "app": "Arc", "window": "acmeco/widget-engine", "pii": [{"text": "acmeco/widget-engine", "label": "private_repo"}], "notes": "bare slug only"}
+{"id": "repo_010", "app": "Arc", "window": "badlogic/pi-mono: AI agent toolkit - GitHub", "pii": [{"text": "badlogic/pi-mono", "label": "private_repo"}], "notes": "plausible-looking repo from real data — synthetic equivalent here"}
+{"id": "handle_001", "app": "Arc", "window": "@priya.shah / X", "pii": [{"text": "@priya.shah", "label": "private_handle"}], "notes": "X profile tab"}
+{"id": "handle_012", "app": "Arc", "window": "@priya.bsky.social", "pii": [{"text": "@priya.bsky.social", "label": "private_handle"}], "notes": "Bluesky handle"}
+{"id": "handle_003", "app": "Discord", "window": "@marcus_c", "pii": [{"text": "@marcus_c", "label": "private_handle"}], "notes": "Discord handle"}
+{"id": "channel_001", "app": "Slack", "window": "#engineering", "pii": [{"text": "#engineering", "label": "private_channel"}], "notes": "bare slack channel"}
+{"id": "channel_005", "app": "Slack", "window": "#incidents - 3 unread", "pii": [{"text": "#incidents", "label": "private_channel"}], "notes": "channel with unread count"}
+{"id": "channel_004", "app": "Discord", "window": "#general | acme-oss", "pii": [{"text": "#general", "label": "private_channel"}, {"text": "acme-oss", "label": "private_company"}], "notes": "Discord server-channel pair"}
+{"id": "id_005", "app": "Arc", "window": "cus_OZ87Y6543210 - Stripe", "pii": [{"text": "cus_OZ87Y6543210", "label": "private_id"}], "notes": "Stripe customer ID"}
+{"id": "id_008", "app": "Arc", "window": "Customer 415555012398765", "pii": [{"text": "415555012398765", "label": "private_id"}], "notes": "15-digit customer ID — looks phone-ish but context says ID"}
+{"id": "id_001", "app": "Arc", "window": "Issue #1234567 · acmeco/widget", "pii": [{"text": "#1234567", "label": "private_id"}, {"text": "acmeco/widget", "label": "private_repo"}], "notes": "long issue number + repo"}
+{"id": "secret_006", "app": "Cursor", "window": "id_rsa.pub - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQ", "pii": [{"text": "AAAAB3NzaC1yc2EAAAADAQABAAABAQ", "label": "secret"}], "notes": "SSH key body — ssh-rsa prefix is public, key body is secret"}
+{"id": "secret_004", "app": "Arc", "window": "https://acme.com/?token=secret_abc123xyz_long_token", "pii": [{"text": "https://acme.com/?token=secret_abc123xyz_long_token", "label": "secret"}], "notes": "URL with embedded token — entire URL is secret-class (don't double-label as URL+secret to keep span set non-overlapping)"}
+{"id": "secret_003", "app": "Cursor", "window": "AWS_SECRET_ACCESS_KEY=wJalrXUtnFEMI/K7MDENG/bPxRfiCYz", "pii": [{"text": "wJalrXUtnFEMI/K7MDENG/bPxRfiCYz", "label": "secret"}], "notes": "AWS secret access key"}
+{"id": "neg_014", "app": "Arc", "window": "Apartment List - 7 Million Apartments for Rent", "pii": [], "notes": "public site marketing copy"}
+{"id": "neg_016", "app": "Arc", "window": "The Real Estate Team OS - Follow Up Boss", "pii": [], "notes": "product + brand — no person/co PII"}
+{"id": "neg_006", "app": "Arc", "window": "Settings", "pii": [], "notes": "generic UI label"}

@@ -1,0 +1,32 @@
+[project]
+name = "screenleak"
+version = "0.0.1"
+description = "Multi-modal benchmark for sensitive information disclosure in computer-use agents"
+authors = [{name = "Louis Beaumont"}]
+requires-python = ">=3.10"
+license = {text = "TBD"}
+
+[project.optional-dependencies]
+trace = [
+    "anthropic>=0.40.0",
+    "openai>=1.50.0",
+    "google-genai>=0.3.0",
+    "python-Levenshtein>=0.25",
+]
+text = [
+    # see text/requirements.txt — vendored after `bash scripts/vendor_text.sh`
+]
+image = [
+    "playwright>=1.40",
+    "pillow>=10",
+    # see image/requirements.txt — vendored after `bash scripts/vendor_image.sh`
+]
+all = ["screenleak[trace,text,image]"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
+[tool.ruff.lint]
+extend-select = ["I", "B", "UP"]
+ignore = ["E501"]

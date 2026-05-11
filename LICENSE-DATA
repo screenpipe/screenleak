@@ -1,0 +1,30 @@
+Creative Commons Attribution 4.0 International (CC BY 4.0)
+
+The bench corpora in this repository — including but not limited to:
+
+  - text/data/*.jsonl
+  - image/corpus/*.jsonl
+  - image/corpus/images_002/*.png  (and any other generated images)
+  - trace/data/*.jsonl
+  - All synthetic PII pools, templates, and adversarial seeds
+
+are released under the Creative Commons Attribution 4.0 International
+License. You are free to share and adapt the data for any purpose,
+including commercially, provided you give appropriate credit, link to
+the license, and indicate any changes.
+
+Full license text: https://creativecommons.org/licenses/by/4.0/legalcode
+
+Attribution format:
+
+    Beaumont, Louis (2026). ScreenLeak: A Multi-Modal Benchmark for
+    Sensitive Information Disclosure in Computer-Use Agents.
+    https://github.com/screenpipe/screenleak
+
+The CODE in this repository (everything not covered above — `*.py`,
+`*.sh`, `*.toml`, `*.md`, etc.) is licensed under Apache License 2.0;
+see `LICENSE`.
+
+All PII appearing in the bench data is FICTIONAL and synthetically
+generated. No real names, addresses, phone numbers, secrets, or other
+identifiable information was used in any corpus.

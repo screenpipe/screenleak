@@ -1,0 +1,59 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+.venv/
+venv/
+env/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+*.egg-info/
+
+# Node
+node_modules/
+.bun/
+package-lock.json
+yarn.lock
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+.vscode/
+
+# Bench artifacts (large, regenerated, not source-of-truth)
+*/corpus/images_002/
+*/corpus/images/
+*.png
+
+# Local ONNX checkpoints — re-vendor with scripts/vendor_image.sh (MODELS=include).
+# Exceeds GitHub's 100 MB push limit; lives in source repo for reproducibility.
+image/models/*.onnx
+!image/templates/**/*.png
+!docs/**/*.png
+
+# Predictions (regenerated per run)
+**/_predictions/
+**/predictions/
+
+# Per-run logs
+**/logs/
+**/_smoke_out/
+
+# API keys / local config
+.env
+.env.local
+*.key
+secrets.json
+
+# Backup / WIP
+*.bak
+*.swp
+*~
+.todo
+SCRATCH.md
