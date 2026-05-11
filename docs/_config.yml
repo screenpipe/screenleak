@@ -1,0 +1,29 @@
+title: ScreenLeak
+description: A multi-modal benchmark measuring how well today's tools redact PII from screen telemetry, screenshots, and computer-use traces.
+author: Louis Beaumont
+url: https://screenpipe.github.io
+baseurl: /screenleak
+
+# Bare-bones build, custom layout in _layouts/default.html.
+# Don't pick a theme — providing our own _layouts/default.html overrides it.
+plugins:
+  - jekyll-seo-tag
+
+defaults:
+  - scope:
+      path: ""
+    values:
+      layout: "default"
+
+markdown: kramdown
+kramdown:
+  syntax_highlighter: rouge
+  syntax_highlighter_opts:
+    css_class: highlight
+  toc_levels: 2..3
+
+# We treat docs/index.md as the front page. No posts, no archives.
+permalink: /:title/
+exclude:
+  - README.md
+  - "*.bak"

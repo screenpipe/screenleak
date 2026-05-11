@@ -5,9 +5,9 @@
 [![ci](https://img.shields.io/badge/ci-pytest%20%2B%20ruff-black)](.github/workflows/ci.yml)
 [![python](https://img.shields.io/badge/python-3.10%2B-blue)](pyproject.toml)
 
-> A multi-modal benchmark for measuring **what computer-use agents see and what they leak** — across desktop telemetry strings, rendered screenshots, and full agentic traces.
+> A multi-modal benchmark measuring **how well today's tools redact PII from screen telemetry, rendered screenshots, and multi-step computer-use traces** — so the data substrate for the next generation of computer-use AI can actually move.
 
-**Status: private staging repo.** Will OSS at v0.1 release.
+Blog: [screenpipe.github.io/screenleak](https://screenpipe.github.io/screenleak/) · Contact: `louis@screenpi.pe`
 
 ## Headline results (v0)
 

@@ -1,23 +1,30 @@
-# ScreenLeak: measuring what computer-use agents leak
+---
+layout: default
+title: "ScreenLeak: the redaction bottleneck on computer-use AI"
+description: "A multi-modal benchmark measuring how well today's tools redact PII from screen telemetry, screenshots, and computer-use traces."
+---
+
+# ScreenLeak: the redaction bottleneck on computer-use AI
 
 *Louis Beaumont · 2026-05-11 · code + data: [github.com/screenpipe/screenleak](https://github.com/screenpipe/screenleak)*
 
-When you give an AI agent control of your desktop, what does it see, and what does it tell anyone else?
+The next generation of AI agents — Anthropic's Computer Use, OpenAI's Operator, Google's Project Mariner — needs computer-use data to get better. Screenshots, accessibility trees, OCR fragments, multi-step traces, the whole substrate of what humans actually do on their machines.
 
-Anthropic [shipped Computer Use](https://www.anthropic.com/news/3-5-models-and-computer-use) in October 2024. OpenAI [shipped Operator](https://openai.com/index/introducing-operator/). Google has Project Mariner. The capability question — *can the agent book a flight, fill a form, click the right button?* — has a half-dozen public benchmarks: WebArena, OSWorld, AgentBench, GAIA, ScreenSpot.
+That data is everywhere. Every desktop produces it continuously. And almost none of it can be moved, shared, logged, fine-tuned on, or published — because every frame is full of names, emails, customer identifiers, internal hostnames, API keys, and Slack channels. **PII is the bottleneck on the entire computer-use research pipeline.**
 
-The disclosure question — *what does the agent transcribe into chat that it shouldn't have?* — has none.
+The capability question — *can the agent book a flight, fill a form, click the right button?* — has a half-dozen public benchmarks: WebArena, OSWorld, AgentBench, GAIA, ScreenSpot. The redaction question — *can existing tools strip the PII out so the data is shareable?* — has none.
 
-That's the gap. **ScreenLeak is a multi-modal benchmark for measuring sensitive-information disclosure in computer-use agents.**
+That's the gap. **ScreenLeak is a multi-modal benchmark for measuring how well today's tools redact sensitive information from screen telemetry, rendered screenshots, and multi-step computer-use traces.** Same question, three surfaces, twelve frontier and commercial systems measured.
 
 ## The headline number
 
-We measured frontier models on two adjacent questions:
+We measured frontier and commercial redactors on three adjacent questions, each corresponding to a step in the data pipeline:
 
-1. *Can they detect PII when explicitly asked?* (text bench)
-2. *Do they withhold it when asked to do an unrelated task?* (trace bench)
+1. *Can the redactor find PII in raw screen telemetry?* — **text bench** (window titles, AX nodes, OCR fragments).
+2. *Can it find PII in rendered screenshots, at pixel precision?* — **image bench** (synthetic but real-shape app screens).
+3. *Will it withhold PII when an agent observes it inside a task?* — **trace bench** (multi-step computer-use traces with injected PII).
 
-The answers separate.
+Three different problems, three different failure profiles, and a clean answer for each.
 
 ### They detect PII fine.
 
@@ -73,7 +80,7 @@ A 28M-parameter RF-DETR (DINOv2-S backbone, 2-layer LWDETR head, 12-class, ~110 
 
 Still, the implication is clean: **pixel-precise on-screen PII detection isn't a frontier-model problem.** It's a "train a small specialized detector on synthetic data and ship it" problem. Frontier vision models are general-purpose grounders being asked to do something detection-shaped; a specialized detector eats their lunch.
 
-The product implication: privacy-screen overlays, agent screen-summary redaction, and ad-blocker-style PII filtering should not be waiting on Sonnet-5 to learn IoU. The capability is already deployable on-device today.
+The product implication: privacy-screen overlays, agent screen-summary redaction, and ad-blocker-style PII filtering should not be waiting on the next frontier VLM to learn IoU. The capability is already deployable on-device today.
 
 ### The pattern
 
@@ -87,7 +94,7 @@ Capability isn't disposition. Recognition isn't refusal. The 91% text recognitio
 
 Anthropic's computer-use safety post called this out as an open question. OpenAI's Operator system card flagged it. Google's Mariner safety doc gestures at it. We measured the gap.
 
-The per-category breakdown is more uncomfortable. GPT-5 and Gemini transcribe people's names ~50–83% of the time when they appear on screen. They transcribe organization-internal repos ~57% of the time. The cleanest finding is on `secret` — every model refuses to repeat API keys, even ones it just read.
+The per-category breakdown is more uncomfortable. GPT-5.5 and Gemini transcribe people's names ~50–83% of the time when they appear on screen. They transcribe organization-internal repos ~57% of the time. The cleanest finding is on `secret` — every model refuses to repeat API keys, even ones it just read.
 
 ## Why three sub-benchmarks
 
@@ -130,11 +137,19 @@ If you're building a computer-use agent and you don't have a disclosure benchmar
 git clone https://github.com/screenpipe/screenleak
 cd screenleak
 make install
-make vendor          # pull text + image benches in
-make trace-data      # build the trace corpus from screenpipe-finetune
-make bench           # run all 3 sub-benches with all configured adapters
-make unify           # rebuild unified leaderboard
+
+# set the API keys for whichever adapters you want to run
+export ANTHROPIC_API_KEY=...
+export OPENAI_API_KEY=...
+export GOOGLE_API_KEY=...
+
+# run any single adapter against the 30-row sample corpus per surface
+make bench-text  ADAPTER=claude      # or: gpt5, gemini, gcp_dlp, regex, …
+make bench-image ADAPTER=rfdetr      # or: claude, gpt5, gemini, regex_ocr, …
+make bench-trace ADAPTER=claude      # or: gpt5, gemini
 ```
+
+The full corpus (422 text + 221 val image + 50 traces) and the synthetic-data generators live in a private companion repo. Researchers running serious evaluations should contact `louis@screenpi.pe` for access; that's the path we expect labs and red teams to use.
 
 Adapter shape is documented in [`CONTRIBUTING.md`](https://github.com/screenpipe/screenleak/blob/main/CONTRIBUTING.md). PRs that add new models welcome — the leaderboard refresh happens automatically.
 
@@ -144,7 +159,7 @@ Adapter shape is documented in [`CONTRIBUTING.md`](https://github.com/screenpipe
 - **Larger trace corpus** — 50 → 200 traces. Tighter CIs, finer model differentiation.
 - **Image bench category coverage** — backport the 4 missing categories (handle, id, date) to bring image symmetric with text + trace.
 - **Multilingual.** Currently English-only on image and trace.
-- **More adapters.** Llama 4 Vision, Qwen3-VL, Pixtral, on-device models (Moondream, Gemma 4 E2B). The leaderboard wants more rows.
+- **More adapters.** Llama 4 Vision, Qwen3-VL, on-device VLMs (Moondream, Gemma 3-E), and the next round of frontier APIs as they ship. The leaderboard wants more rows.
 
 ## Cite this
 
