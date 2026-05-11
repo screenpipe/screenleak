@@ -17,6 +17,7 @@ Blog: [screenpipe.github.io/screenleak](https://screenpipe.github.io/screenleak/
 | Claude Opus 4.7 | 87.8% | 2.1% | 36.0% |
 | Gemini 3.1 Pro Preview | **91.0%** | **4.2%** | 20.0% |
 | `rfdetr_v8` *(local image DETR, 12-class)* | — | **95.3%** | — |
+| `privacy_filter_ft_v6` *(local text fine-tune, 1.4B)* | 80.9% | — | — |
 | `privacy_filter_ft_v3` *(local text fine-tune, 1.4B)* | 79.4% | — | — |
 | `opf_rs` *(same model, Rust runtime)* | 75.9% | — | — |
 | `privacy_filter` *(base OPF)* | 38.6% | — | — |
@@ -29,11 +30,11 @@ Three distinct failure modes, each measured separately. See [`results/unified_le
 
 ### Findings
 
-**1. Frontier APIs detect PII fine. Cloud DLP products don't.** On the text bench (window titles, AX nodes, OCR fragments), Gemini 3.1 Pro / GPT-5.5 / Claude Opus 4.7 all score 87.8–91.0% zero-leak, beating the strongest local model (`privacy_filter_ft_v3` at 79.4%) by 8–12 points. **Google Cloud DLP (37.7%) and Microsoft Presidio (35.4%) — the two flagship commercial PII products — barely beat a hand-rolled regex (33.9%).** They were built for documents (resumes, support tickets), not screen telemetry, and it shows: window-title fragments, code identifiers, and Slack/Outlook UI chrome fall outside their infoType taxonomy.
+**1. Frontier APIs detect PII fine. Cloud DLP products don't.** On the text bench (window titles, AX nodes, OCR fragments), Gemini 3.1 Pro / GPT-5.5 / Claude Opus 4.7 all score 87.8–91.0% zero-leak, beating the strongest local model (`privacy_filter_ft_v6` at 80.9%) by 7–10 points. **Google Cloud DLP (37.7%) and Microsoft Presidio (35.4%) — the two flagship commercial PII products — barely beat a hand-rolled regex (33.9%).** They were built for documents (resumes, support tickets), not screen telemetry, and it shows: window-title fragments, code identifiers, and Slack/Outlook UI chrome fall outside their infoType taxonomy.
 
-**2. Frontier APIs cannot locate PII in pixels — but a small specialized detector can.** On the image bench (n=221 rendered screenshots, IoU ≥ 0.30), the best frontier model — Gemini 3.1 Pro at 4.2% — barely edges a hand-rolled regex + Tesseract OCR pipeline (2.6%). Claude Opus 4.7 (2.1%) and **Google Cloud DLP (2.6%)** are statistically indistinguishable from `regex_ocr`. **No frontier model breaks 5% zero-leak; Google's commercial DLP product doesn't either.** A locally fine-tuned RF-DETR (`rfdetr_v8`, ~28M-param DINOv2-S + LWDETR head, trained on the same generator distribution) scores **95.3%** — a 90-point gap. The pattern: frontier vision models can *name* what they see but can't *draw boxes* tight enough to count; an in-distribution detector trained on synthetic screens dominates at a fraction of the cost.
+**2. Frontier APIs cannot locate PII in pixels — but a small specialized detector can.** On the image bench (n=190 PII-bearing rendered screenshots, IoU ≥ 0.30), every frontier model's zero-leak rate has a Wilson 95% CI that overlaps with the others *and* with a hand-rolled Tesseract + regex pipeline (2.6%). Only Gemini 3.1 Pro's upper CI bound (8.1%) reaches above 5%; Claude Opus 4.7, GPT-5.5, and Google Cloud DLP are statistically indistinguishable from `regex_ocr`. A locally fine-tuned RF-DETR (`rfdetr_v8`, ~28M-param DINOv2-S + LWDETR head, trained on the same generator distribution) scores **95.3%** zero-leak with a lower CI bound of 91.2% — decisively separated from every other adapter. Frontier vision models can *name* what they see but can't *draw boxes* tight enough to count at IoU 0.30; an in-distribution detector trained on synthetic screens dominates at a fraction of the cost.
 
-**3. Frontier APIs don't withhold PII when working.** On the trace bench (summarize screen content with injected PII), the best — GPT-5.5 at 64.0% — leaks at least one observed PII item in 36% of traces. The worst, Gemini 3.1 Pro Preview at 20.0% no-leak, leaks in 80%.
+**3. Frontier APIs don't withhold PII when working.** On the trace bench (summarize screen content with injected PII, n=25 val), the best — GPT-5.5 at 64.0% (95% bootstrap CI 44–80%) — leaks at least one observed PII item in 36% of traces. Gemini 3.1 Pro Preview at 20.0% (4–36%) leaks in 80% of traces. CIs are wide; ranking is suggestive, not decisive.
 
 **The pattern:** capability (text bench) ≠ pixel grounding (image bench) ≠ disposition (trace bench). A model that nails text PII detection at 91% can still leak it 80% of the time when it observes that PII inside a task.
 
@@ -55,7 +56,7 @@ ScreenLeak is the missing measurement.
 |---|---|---|
 | **`text/`** | Given a desktop telemetry string (window title, AX node, OCR fragment), find PII spans | 422 hand-crafted cases, 13 categories, multilingual + adversarial splits |
 | **`image/`** | Given a rendered screen, find pixel regions containing PII | 2,206 synthetic screenshots across 9 real-app templates with pixel-perfect DOM-extracted bboxes |
-| **`trace/`** | Given a multi-turn computer-use trace where the screen contains PII, does the agent's output leak it? | 50–100 traces with injected PII, scored on unprompted leakage + adversarial prompt-injection |
+| **`trace/`** | Given a multi-turn computer-use trace where the screen contains PII, does the agent's output leak it? | 50 traces (25 train + 25 val) with injected PII, scored on unprompted leakage. Adversarial prompt-injection split is v0.1. |
 
 All three use the same canonical 12-class taxonomy (see [CATEGORIES.md](./CATEGORIES.md)). Image bench is currently asymmetric — see [LIMITATIONS.md](./LIMITATIONS.md).
 

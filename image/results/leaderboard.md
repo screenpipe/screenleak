@@ -1,16 +1,18 @@
 # Image-PII Bench — Leaderboard
 
-Sorted by **per-image zero-leak** at IoU ≥ 0.3. Zero-leak = fraction of PII-bearing images where the redactor caught EVERY gold region (with a label that maps to the gold's).
+Sorted by **per-image zero-leak** at IoU ≥ 0.3. Zero-leak = fraction of PII-bearing images where the redactor caught EVERY gold region (with a label that maps to the gold's). 95% Wilson confidence interval shown (n=190 PII-bearing images).
 
-| Adapter | Zero-leak | Oversmash | Macro-F1 | Micro-F1 | p50 (ms) | p95 (ms) |
+| Adapter | Zero-leak (95% CI) | Oversmash | Macro-F1 | Micro-F1 | p50 (ms) | p95 (ms) |
 |---|---:|---:|---:|---:|---:|---:|
-| `rfdetr` | 95.3% | 0.0% | 0.871 | 0.970 | 285 | 432 |
-| `gemini` | 4.2% | 9.7% | 0.038 | 0.034 | 6988 | 19836 |
-| `gpt5` | 3.2% | 22.6% | 0.093 | 0.136 | 39534 | 45623 |
-| `regex_ocr` | 2.6% | 3.2% | 0.318 | 0.400 | 369 | 547 |
-| `gcp_dlp` | 2.6% | 19.4% | 0.218 | 0.343 | 413 | 612 |
-| `claude` | 2.1% | 35.5% | 0.100 | 0.153 | 7417 | 11469 |
-| `presidio_image` | 0.5% | 48.4% | 0.190 | 0.269 | 377 | 548 |
+| `rfdetr` | 95.3% (91.2%–97.5%) | 0.0% | 0.871 | 0.970 | 285 | 432 |
+| `gemini` | 4.2% (2.1%–8.1%) | 9.7% | 0.038 | 0.034 | 6988 | 19836 |
+| `gpt5` | 3.2% (1.5%–6.7%) | 22.6% | 0.093 | 0.136 | 39534 | 45623 |
+| `regex_ocr` | 2.6% (1.1%–6.0%) | 3.2% | 0.318 | 0.400 | 369 | 547 |
+| `gcp_dlp` | 2.6% (1.1%–6.0%) | 19.4% | 0.218 | 0.343 | 413 | 612 |
+| `claude` | 2.1% (0.8%–5.3%) | 35.5% | 0.100 | 0.153 | 7417 | 11469 |
+| `presidio_image` | 0.5% (0.1%–2.9%) | 48.4% | 0.190 | 0.269 | 377 | 548 |
+
+**Statistical note:** Claude, GPT-5.5, Google Cloud DLP, and `regex_ocr` have substantially overlapping CIs — they are statistically indistinguishable on n=190. Only RF-DETR's lower CI bound (91.2%) decisively separates from every other adapter.
 
 ## Per-category recall
 

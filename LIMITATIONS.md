@@ -13,7 +13,7 @@ What ScreenLeak doesn't measure, doesn't cover, or measures imperfectly. Updated
 
 **Why this matters:** frontier models may overfit to "synthetic-looking" UI. A model that scores 90% zero-leak on `image/` may still leak on a real Slack screenshot with anti-aliasing artifacts, third-party browser extensions, or unusual font rendering.
 
-**Mitigation in v0:** templates closely mimic real apps (Slack, Outlook, Cursor, Arc, 1Password, Confluence, GitHub PR, Calendar, Linear). Hard negatives (blank inboxes, public repo READMEs) are baked in. We have private validation against real screenshots and report aggregate gap, not individual screenshots.
+**Mitigation in v0:** templates closely mimic real apps (Slack, Outlook, Cursor, Arc, 1Password, Confluence, GitHub PR, Calendar, Terminal). Hard negatives (blank inboxes, public repo READMEs) are baked in. **Real-screen validation is not part of v0 — it's slated for v1.0.** Until then, treat the absolute image-bench numbers as best-case (in-distribution) figures, and treat the *relative* ordering of adapters as the load-bearing signal.
 
 ### Category asymmetry
 
@@ -41,7 +41,7 @@ Either generate synthetic spans for these (post-v0.1 backport) or interpret the 
 
 ### Trace bench is small
 
-50–100 traces in v0. Confidence intervals will be wide. We report 95% bootstrap CIs but readers should treat individual model rankings as directional, not authoritative.
+50 traces total in v0 (25 train + 25 val); the leaderboard scores against the val split. With n=25 the 95% bootstrap CIs are ~±20 percentage points wide — comfortably wide enough that the ranking is suggestive but not decisive between adjacent rows. v0.1 scales the corpus to 200 (val 100).
 
 ### Image bench: GPT-5.5 is slow
 
