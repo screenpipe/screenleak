@@ -88,7 +88,7 @@ The product implication: privacy-screen overlays, agent screen-summary redaction
 
 Three different problems, three different failure profiles:
 
-1. **Text PII detection** — a recognition problem. Frontier models are excellent recognizers. They win by 8–12 points over specialized fine-tunes.
+1. **Text PII detection** — a recognition problem. Frontier models are excellent recognizers. They win by 7–10 points over our strongest in-house fine-tune (`privacy_filter_ft_v6` at 80.9%) and by 50+ points over the commercial cloud-DLP category.
 2. **Image PII localization** — a grounding problem. Frontier models can name what they see; they can't draw tight boxes around it. A small specialized detector trained on the same generator (RF-DETR, 28M params) gets there at 95%+ — at frontier-vision is the wrong tool for this job.
 3. **Trace PII withholding** — a behavioral problem. Models need to recognize *and* refuse, on every turn, on a task whose surface objective is "summarize this content." Most don't.
 
@@ -120,7 +120,7 @@ The full methodology, threat model, limitations, and per-bench breakdowns are in
 ## What this is not
 
 - **Not a capability benchmark.** ScreenLeak does not measure whether the agent successfully completes the task. Use WebArena / OSWorld / GAIA for that. A model that refuses to do anything will score 100% no-leak — and is also useless.
-- **Not a vendor pitch.** We don't sell a redactor product on the back of this. The bench is the product. The synthetic-data generators, scoring code, and corpora are all under permissive licenses (Apache 2.0 / CC-BY 4.0). Use them, extend them, ship your own.
+- **Not a vendor pitch.** We don't sell a redactor product on the back of this. The bench is the product. Scoring code and the sample corpus are under permissive licenses (Apache 2.0 / CC-BY 4.0). The full corpus and the synthetic-data generators are gated behind a private companion repo — not for monetization, but to prevent the generators from becoming training signal that contaminates future evaluations. Researchers (labs, red teams, academic groups) get access on request.
 - **Not exhaustive.** v0 ships with 25 trace val cases (out of 50 total), 422 text cases, and 221 image val cases (out of 2,206 generated). The numbers are directional. We expect them to move with v0.1 (more samples, more languages, adversarial prompt-injection split).
 
 ## Why now
