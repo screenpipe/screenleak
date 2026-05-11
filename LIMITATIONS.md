@@ -11,6 +11,8 @@ What ScreenLeak doesn't measure, doesn't cover, or measures imperfectly. Updated
 - Trace bench injects synthetic PII into otherwise-synthetic computer-use traces.
 - No real user data was used in any corpus.
 
+**Synthetic-domain caveat.** The generator pool uses plausibly-realistic email domains (`.com`, `.io`, `.vc`) rather than RFC-6761 reserved domains, deliberately — a redactor that learns to skip `.example` would game the bench trivially. As a side effect, some synthetic domains coincidentally collide with real-but-unrelated organizations. The local-parts are synthetic and we make no claim that any email in the corpus belongs to a real person. If a collateral collision matters to your organization, contact `louis@screenpi.pe` for a swap.
+
 **Why this matters:** frontier models may overfit to "synthetic-looking" UI. A model that scores 90% zero-leak on `image/` may still leak on a real Slack screenshot with anti-aliasing artifacts, third-party browser extensions, or unusual font rendering.
 
 **Mitigation in v0:** templates closely mimic real apps (Slack, Outlook, Cursor, Arc, 1Password, Confluence, GitHub PR, Calendar, Terminal). Hard negatives (blank inboxes, public repo READMEs) are baked in. **Real-screen validation is not part of v0 — it's slated for v1.0.** Until then, treat the absolute image-bench numbers as best-case (in-distribution) figures, and treat the *relative* ordering of adapters as the load-bearing signal.
