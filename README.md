@@ -29,21 +29,30 @@ Blog: [screenpipe.github.io/screenleak](https://screenpipe.github.io/screenleak/
 
 Three distinct failure modes, each measured separately. See [`results/unified_leaderboard.md`](results/unified_leaderboard.md) for the full table with model-id mapping, plus the per-sub-bench leaderboards for CIs and category breakdowns. Per-compliance-framework breakdowns (HIPAA / GDPR / CCPA / SOC 2 / PCI DSS / DPDPA) in [`text/results/framework_coverage.md`](text/results/framework_coverage.md).
 
-### Deployment cost (text adapters)
+### Full comparison — text adapters
 
-Zero-leak alone is half the picture. The other half is what a model costs to *run*:
+One table, every metric. Sorted by zero-leak (the privacy-relevant metric). "Size" is the artifact on disk; "RAM" is peak RSS during inference; "p50 / p95" is per-redaction wall-clock.
 
-| Adapter | Local | Model size on disk | Peak RSS during inference | p50 latency |
-|---|:---:|---:|---:|---:|
-| `regex` | ✅ | < 1 MB | ~ 30 MB | < 1 ms |
-| `presidio` | ✅ | ~ 200 MB | ~ 400 MB | 6 ms |
-| `v45_phase3` ⭐ | ✅ | **278 MB** (INT8 ONNX) | **1.1 GB** (Rust `ort` runtime) | **9 ms** |
-| `gliner_pii` | ✅ | ~ 500 MB | ~ 1.5 GB | 104 ms |
-| `opf_rs` / `privacy_filter` family | ✅ | ~ 1.4 GB | ~ 6 GB | 1 – 120 ms |
-| `gcp_dlp` | ❌ cloud | 0 MB local | 0 MB local | 84 ms |
-| `claude` / `gpt5` / `gemini` | ❌ cloud | 0 MB local | 0 MB local | 1.5 – 3.8 s |
+| Adapter | Local | Zero-leak | Oversmash | Macro-F1 | Size | RAM | p50 | p95 |
+|---|:---:|---:|---:|---:|---:|---:|---:|---:|
+| `gemini` (gemini-3.1-pro-preview) | ❌ | **91.0%** | 2.6% | 0.85 | — | — | 3 754 ms | 8 237 ms |
+| `gpt5` (gpt-5.5) | ❌ | 90.7% | 5.2% | 0.85 | — | — | 2 173 ms | 4 722 ms |
+| `claude` (claude-opus-4-7) | ❌ | 87.8% | 5.2% | 0.81 | — | — | 1 550 ms | 2 879 ms |
+| **`v45_phase3`** ⭐ | ✅ | **86.7%**[†](#v45-fn) | **0.0%** | 0.78 | **278 MB** (INT8 ONNX) | **1.1 GB** | **9 ms** | **22 ms** |
+| `privacy_filter_ft_v6` | ✅ | 80.9% | 3.9% | 0.72 | ~ 1.4 GB | ~ 6 GB | 54 ms | 99 ms |
+| `privacy_filter_ft_v3` | ✅ | 79.4% | 7.8% | 0.69 | ~ 1.4 GB | ~ 6 GB | 118 ms | 237 ms |
+| `privacy_filter_ft_v2` | ✅ | 78.0% | 6.5% | 0.70 | ~ 1.4 GB | ~ 6 GB | 23 ms | 24 ms |
+| `opf_rs` (Rust runtime) | ✅ | 75.9% | 7.8% | 0.68 | ~ 1.4 GB | ~ 6 GB | < 1 ms‡ | < 1 ms‡ |
+| `layered` (stacked baseline) | ✅ | 65.8% | 2.6% | 0.71 | varies | varies | 23 ms | 24 ms |
+| `gliner_pii` | ✅ | 62.6% | 79.2% | 0.44 | ~ 500 MB | ~ 1.5 GB | 104 ms | 112 ms |
+| `privacy_filter` (base OPF) | ✅ | 38.6% | 9.1% | 0.35 | ~ 1.4 GB | ~ 6 GB | 22 ms | 23 ms |
+| `gcp_dlp` | ❌ | 37.7% | 11.7% | 0.24 | — | — | 84 ms | 185 ms |
+| `presidio` | ✅ | 35.4% | 22.1% | 0.20 | ~ 200 MB | ~ 400 MB | 6 ms | 8 ms |
+| `regex` | ✅ | 33.9% | 1.3% | 0.57 | < 1 MB | ~ 30 MB | < 1 ms | < 1 ms |
 
-`v45_phase3` is the only adapter within 5 points of frontier zero-leak that **also** stays under 300 MB on disk and 10 ms per redaction. The 1.4 B `privacy_filter` family is comparable in zero-leak but pushes 8 GB laptops into swap. Cloud APIs trade local memory for ~ 1.5 – 3.8 s per redaction and per-call billing. See [`text/results/leaderboard.md#deployment-cost`](text/results/leaderboard.md#deployment-cost) for the full per-adapter table and measurement methodology.
+**`v45_phase3` is the only row that's strong on every dimension**: within 5 points of frontier zero-leak, **zero** oversmash, fits in 278 MB on disk, 1.1 GB RAM peak, 9 ms per redaction, fully local. The 1.4 B `privacy_filter` family is close on zero-leak but needs 6 GB resident — knocks 8 GB laptops into swap. Cloud APIs trade local memory for $/call and 1.5 – 3.8 s of latency. The two flagship deterministic products (`gcp_dlp`, `presidio`) barely clear a hand-rolled regex and oversmash 11 – 22% of negatives.
+
+The `v45_phase3` RAM and p50 numbers come from a real `/usr/bin/time -l` measurement of the [`v45_phase3_smoke`](https://github.com/screenpipe/screenpipe/blob/main/crates/screenpipe-redact/examples/v45_phase3_smoke.rs) example in the `screenpipe-redact` Rust crate. Other rows' Size / RAM are documented from each adapter's model card; full re-measurement is on the post-v0.1 roadmap (`¹`). `‡` `opf_rs`'s sub-millisecond p50 is warm-batched; per-call latency on a long-running daemon is closer to 5 ms.
 
 <a id="v45-fn"></a>† `v45_phase3` is scored on the 735-case private companion bench (mean of HIPAA / GDPR / CCPA / SOC 2 / PCI DSS / DPDPA zero-leak — 87.2 / 86.6 / 86.6 / 85.5 / 86.7 / 87.1) — the framework-coverage metric, not the same 422-case `text/` bench-eval the other adapters were run on. The 47-case public `sample.jsonl` zero-leak (a smaller, harder sub-bench with framework-targeted cases) is 76.6% (CI 63.8 – 87.2%); see [`text/results/leaderboard.md`](text/results/leaderboard.md) and [`text/results/framework_coverage.md`](text/results/framework_coverage.md).
 
@@ -77,7 +86,7 @@ ScreenLeak is the missing measurement.
 | **`image/`** | Given a rendered screen, find pixel regions containing PII | 2,206 synthetic screenshots across 9 real-app templates with pixel-perfect DOM-extracted bboxes |
 | **`trace/`** | Given a multi-turn computer-use trace where the screen contains PII, does the agent's output leak it? | 50 traces (25 train + 25 val) with injected PII, scored on unprompted leakage. Adversarial prompt-injection split is v0.1. |
 
-All three use the same canonical 12-class taxonomy (see [CATEGORIES.md](./CATEGORIES.md)). Image bench is currently asymmetric — see [LIMITATIONS.md](./LIMITATIONS.md).
+All three use the same canonical 13-class taxonomy (see [CATEGORIES.md](./CATEGORIES.md); 13th label is `private_sensitive` for Art. 9 / non-Safe-Harbor PHI). Image bench is currently asymmetric — see [LIMITATIONS.md](./LIMITATIONS.md).
 
 ## Headline claim
 
