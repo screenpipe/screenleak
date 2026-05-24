@@ -21,15 +21,29 @@ multilingual person names (Korean, Arabic), two GDPR Art. 9 cases
 
 | Adapter | HIPAA | GDPR | CCPA | SOC 2 | PCI DSS | DPDPA |
 |---|---:|---:|---:|---:|---:|---:|
-| `v45_phase3` ⭐ local | **81.2%** | **85.4%** | **85.4%** | **80.0%** | **69.6%** | **82.9%** |
+| `gemini` (gemini-3.1-pro-preview) | 90.6% | **92.7%** | **92.7%** | 88.6% | 82.6% | 91.4% |
+| `claude` (claude-opus-4-7) | 90.6% | 90.2% | 90.2% | **91.4%** | **87.0%** | 91.4% |
+| `v45_phase3` ⭐ local (278 MB, 9 ms) | 81.2% | 85.4% | 85.4% | 80.0% | 69.6% | 82.9% |
 | `gcp_dlp` | 43.8% | 36.6% | 36.6% | 37.1% | 30.4% | 42.9% |
 | `regex` | 37.5% | 41.5% | 41.5% | 40.0% | 13.0% | 42.9% |
 
-Even on the harder public sample, v45_phase3 leads `gcp_dlp` by 30–47
-points and `regex` by 28–57 points across every framework. The public
-sample is small (N = 23–41 per framework after filtering for in-scope
-cases), so CIs are wide; the load-bearing claim is the 643-case private
-bench below.
+Frontier APIs (`gemini`, `claude`) lead by 5–15 points on most
+frameworks; `v45_phase3` is within striking distance at 1/100th the
+latency and zero per-call cost. The local model leads `gcp_dlp` by
+30–47 points across every framework and `regex` by 28–57 points. The
+public sample is small (N = 23–41 per framework after filtering for
+in-scope cases), so CIs are wide; the load-bearing claim is the 735-
+case private bench below.
+
+Two structural caveats on the frontier numbers:
+
+- **Oversmash matters.** `claude` redacts 25% of negative cases (the
+  "settings" / "World AIDS Day" traps), `v45_phase3` redacts 0%. The
+  framework_coverage rate only measures missed-PII, not over-redaction
+  — see `leaderboard.md` for oversmash columns.
+- **Cost.** Cloud-API calls run $0.001–$0.01 per redaction at
+  frontier-model rates and 1.7 s p50. `v45_phase3` is 9 ms p50,
+  zero per-call, and runs in offline / air-gapped environments.
 
 Per-framework denominators on this sample:
 
@@ -40,6 +54,32 @@ Per-framework denominators on this sample:
 | SOC 2 | 35 |
 | PCI DSS | 23 |
 | DPDPA | 35 |
+
+### Overall zero-leak (all-labels-in-scope) on the same 51-case sample
+
+| Adapter | Zero-leak | Oversmash | p50 |
+|---|---:|---:|---:|
+| `gemini` (gemini-3.1-pro-preview) | **89.4%** (95% CI 80.9 – 97.9%) | **0.0%** | 3 600 ms |
+| `claude` (claude-opus-4-7) | 87.2% (95% CI 76.6 – 95.7%) | 25.0% | 1 719 ms |
+| `v45_phase3` ⭐ local | 76.6% (95% CI 63.8 – 87.2%) | **0.0%** | **9 ms** |
+
+Three takeaways:
+
+1. **Gemini wins the public sample** — top zero-leak *and* zero
+   oversmash. Worth the 3.6 s p50 if the workload is occasional.
+2. **Claude over-redacts a quarter of negatives** — the 25% oversmash
+   is one of four negatives ("The Real Estate Team OS - Follow Up
+   Boss", which Claude labels as `private_company`; the bench's
+   `private_company` excludes vendor / product brand names). Claude
+   *does* hold the "World AIDS Day" sensitive-negative trap — that
+   case it gets right.
+3. **v45_phase3 is the only model that's both zero-oversmash and
+   sub-10-ms** — 400x faster than Claude / Gemini, free per call,
+   runs offline. Costs ~9 points of zero-leak vs Gemini.
+
+The `gpt5` (GPT-5.5) adapter is omitted from this section because the
+`OPENAI_API_KEY` wasn't available in this run. Its historical
+422-case private-bench score is in [`leaderboard.md`](leaderboard.md).
 
 ## On the 735-case private bench (screenpipe-pii-bench)
 

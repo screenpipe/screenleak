@@ -1,0 +1,161 @@
+{
+  "adapter": "gemini",
+  "n_cases": 51,
+  "n_gold_cases": 47,
+  "n_negative_cases": 4,
+  "zero_leak_rate": 0.894,
+  "zero_leak_ci_95": [
+    0.809,
+    0.979
+  ],
+  "oversmash_rate": 0.0,
+  "macro_f1": 0.917,
+  "micro_f1": 0.943,
+  "micro_precision": 0.967,
+  "micro_recall": 0.921,
+  "per_label": {
+    "private_address": {
+      "tp": 3,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0
+    },
+    "private_channel": {
+      "tp": 3,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0
+    },
+    "private_company": {
+      "tp": 4,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0
+    },
+    "private_date": {
+      "tp": 1,
+      "fp": 0,
+      "fn": 3,
+      "precision": 1.0,
+      "recall": 0.25,
+      "f1": 0.4
+    },
+    "private_email": {
+      "tp": 3,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0
+    },
+    "private_handle": {
+      "tp": 4,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0
+    },
+    "private_id": {
+      "tp": 11,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0
+    },
+    "private_person": {
+      "tp": 14,
+      "fp": 1,
+      "fn": 0,
+      "precision": 0.933,
+      "recall": 1.0,
+      "f1": 0.966
+    },
+    "private_phone": {
+      "tp": 3,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0
+    },
+    "private_repo": {
+      "tp": 4,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0
+    },
+    "private_sensitive": {
+      "tp": 3,
+      "fp": 1,
+      "fn": 1,
+      "precision": 0.75,
+      "recall": 0.75,
+      "f1": 0.75
+    },
+    "private_url": {
+      "tp": 3,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0
+    },
+    "secret": {
+      "tp": 2,
+      "fp": 0,
+      "fn": 1,
+      "precision": 1.0,
+      "recall": 0.667,
+      "f1": 0.8
+    }
+  },
+  "by_difficulty": {
+    "medium": {
+      "n": 47,
+      "zero_leak_rate": 0.894
+    }
+  },
+  "latency_ms": {
+    "p50": 3599.9,
+    "p95": 8362.6,
+    "mean": 4117.3
+  },
+  "leaked_examples": [
+    {
+      "id": "secret_004",
+      "input": "Arc | https://acme.com/?token=secret_abc123xyz_long_token",
+      "difficulty": "medium"
+    },
+    {
+      "id": "phi_002",
+      "input": "Practice Fusion | M. Cruz - DOB 1985-03-14 - appt 2026-04-12",
+      "difficulty": "medium"
+    },
+    {
+      "id": "phi_004",
+      "input": "Notes | Aleksandr V. - sertraline 50mg, started 2026-02-10",
+      "difficulty": "medium"
+    },
+    {
+      "id": "pci_003",
+      "input": "Notes | Visa 4242 4242 4242 4242 exp 12/2028",
+      "difficulty": "medium"
+    },
+    {
+      "id": "art9_orientation",
+      "input": "Slack | DM with @priya.shah: came out as lesbian to family",
+      "difficulty": "medium"
+    }
+  ],
+  "oversmash_examples": []
+}
