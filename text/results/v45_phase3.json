@@ -1,18 +1,18 @@
 {
   "adapter": "v45_phase3",
-  "n_cases": 36,
-  "n_gold_cases": 33,
-  "n_negative_cases": 3,
-  "zero_leak_rate": 0.879,
+  "n_cases": 51,
+  "n_gold_cases": 47,
+  "n_negative_cases": 4,
+  "zero_leak_rate": 0.766,
   "zero_leak_ci_95": [
-    0.758,
-    0.97
+    0.638,
+    0.872
   ],
   "oversmash_rate": 0.0,
-  "macro_f1": 0.884,
-  "micro_f1": 0.901,
-  "micro_precision": 0.914,
-  "micro_recall": 0.889,
+  "macro_f1": 0.78,
+  "micro_f1": 0.845,
+  "micro_precision": 0.925,
+  "micro_recall": 0.778,
   "per_label": {
     "private_address": {
       "tp": 3,
@@ -38,6 +38,14 @@
       "recall": 1.0,
       "f1": 1.0
     },
+    "private_date": {
+      "tp": 0,
+      "fp": 0,
+      "fn": 4,
+      "precision": 0,
+      "recall": 0.0,
+      "f1": 0
+    },
     "private_email": {
       "tp": 3,
       "fp": 0,
@@ -47,28 +55,28 @@
       "f1": 1.0
     },
     "private_handle": {
-      "tp": 3,
+      "tp": 4,
       "fp": 1,
       "fn": 0,
-      "precision": 0.75,
+      "precision": 0.8,
       "recall": 1.0,
-      "f1": 0.857
+      "f1": 0.889
     },
     "private_id": {
-      "tp": 3,
+      "tp": 8,
       "fp": 1,
-      "fn": 0,
-      "precision": 0.75,
-      "recall": 1.0,
-      "f1": 0.857
+      "fn": 3,
+      "precision": 0.889,
+      "recall": 0.727,
+      "f1": 0.8
     },
     "private_person": {
-      "tp": 3,
+      "tp": 13,
       "fp": 0,
       "fn": 1,
       "precision": 1.0,
-      "recall": 0.75,
-      "f1": 0.857
+      "recall": 0.929,
+      "f1": 0.963
     },
     "private_phone": {
       "tp": 2,
@@ -85,6 +93,14 @@
       "precision": 1.0,
       "recall": 1.0,
       "f1": 1.0
+    },
+    "private_sensitive": {
+      "tp": 1,
+      "fp": 1,
+      "fn": 3,
+      "precision": 0.5,
+      "recall": 0.25,
+      "f1": 0.333
     },
     "private_url": {
       "tp": 3,
@@ -105,14 +121,14 @@
   },
   "by_difficulty": {
     "medium": {
-      "n": 33,
-      "zero_leak_rate": 0.879
+      "n": 47,
+      "zero_leak_rate": 0.766
     }
   },
   "latency_ms": {
-    "p50": 21.5,
-    "p95": 93.2,
-    "mean": 211.0
+    "p50": 8.7,
+    "p95": 21.7,
+    "mean": 87.8
   },
   "leaked_examples": [
     {
@@ -133,6 +149,41 @@
     {
       "id": "secret_003",
       "input": "Cursor | AWS_SECRET_ACCESS_KEY=wJalrXUtnFEMI/K7MDENG/bPxRfiCYz",
+      "difficulty": "medium"
+    },
+    {
+      "id": "phi_001",
+      "input": "Epic | Patient: Aiden Park (MRN-7430182)",
+      "difficulty": "medium"
+    },
+    {
+      "id": "phi_002",
+      "input": "Practice Fusion | M. Cruz - DOB 1985-03-14 - appt 2026-04-12",
+      "difficulty": "medium"
+    },
+    {
+      "id": "phi_003",
+      "input": "Mail | Re: HIV antibody results for Maria Cruz Lopez (chart #44218)",
+      "difficulty": "medium"
+    },
+    {
+      "id": "phi_004",
+      "input": "Notes | Aleksandr V. - sertraline 50mg, started 2026-02-10",
+      "difficulty": "medium"
+    },
+    {
+      "id": "pci_001",
+      "input": "Arc | Charge $129.00 to *4242 - cardholder Aiden Park",
+      "difficulty": "medium"
+    },
+    {
+      "id": "pci_003",
+      "input": "Notes | Visa 4242 4242 4242 4242 exp 12/2028",
+      "difficulty": "medium"
+    },
+    {
+      "id": "art9_orientation",
+      "input": "Slack | DM with @priya.shah: came out as lesbian to family",
       "difficulty": "medium"
     }
   ],

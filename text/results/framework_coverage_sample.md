@@ -16,19 +16,19 @@ for the exact `FRAMEWORK_LABELS` dict.
 
 | Adapter | HIPAA | GDPR | CCPA | SOC 2 | PCI DSS | DPDPA |
 |---|---:|---:|---:|---:|---:|---:|
-| `v45_phase3` | 100.0% | 100.0% | 100.0% | 95.2% | 90.0% | 100.0% |
-| `regex` | 66.7% | 63.0% | 63.0% | 66.7% | 30.0% | 71.4% |
-| `gcp_dlp` | 66.7% | 48.1% | 48.1% | 52.4% | 40.0% | 61.9% |
+| `v45_phase3` | 81.2% | 85.4% | 85.4% | 80.0% | 69.6% | 82.9% |
+| `regex` | 37.5% | 41.5% | 41.5% | 40.0% | 13.0% | 42.9% |
+| `gcp_dlp` | 43.8% | 36.6% | 36.6% | 37.1% | 30.4% | 42.9% |
 
 Per-framework denominators on this sample:
 
 | | applicable cases |
 |---|---:|
-| HIPAA | 18 |
-| GDPR | 27 |
-| CCPA | 27 |
-| SOC 2 | 21 |
-| PCI DSS | 10 |
-| DPDPA | 21 |
+| HIPAA | 32 |
+| GDPR | 41 |
+| CCPA | 41 |
+| SOC 2 | 35 |
+| PCI DSS | 23 |
+| DPDPA | 35 |
 
 _See [`leaderboard.md`](leaderboard.md) for the overall zero-leak metric, [`framework_coverage.md`](framework_coverage.md) for the canonical writeup, and [`../METHODOLOGY.md`](../METHODOLOGY.md) for scoring rules._

@@ -16,6 +16,7 @@ LABELS = [
     "private_person", "private_email", "private_phone", "private_address",
     "private_url", "private_date", "private_company", "private_repo",
     "private_handle", "private_channel", "private_id", "secret",
+    "private_sensitive",
 ]
 
 SCHEMA: dict[str, Any] = {
@@ -55,8 +56,9 @@ Categories (use these label names exactly):
 - private_repo: org/repo references on GitHub/GitLab. NOT famous OSS repos.
 - private_handle: social handles (@username)
 - private_channel: slack channels (#x), subreddits (r/x), discord channels
-- private_id: UUIDs, customer/order/session IDs, license keys, long issue numbers
+- private_id: UUIDs, customer/order/session IDs, license keys, long issue numbers, government IDs (SSN, NINO, Aadhaar, CPF), card numbers / last-four, MRNs
 - secret: API keys, bearer tokens, passwords-in-URLs
+- private_sensitive: Art. 9 / non-Safe-Harbor PHI context — diagnoses, prescribed medications, religion, sexual orientation, political/union affiliation, biometric/genetic data attached to a person
 
 Do NOT redact public brand names, generic UI labels (Settings, Inbox), or empty windows.
 Return JSON: {"spans": [{"text": "...", "label": "..."}, ...]}. Empty spans array if nothing PII."""

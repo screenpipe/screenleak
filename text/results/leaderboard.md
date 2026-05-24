@@ -7,7 +7,7 @@ Sorted by **zero-leak rate** (the % of cases with PII where ALL gold spans were 
 | `gemini` | 91.0% (88.1%-93.9%) | 2.6% | 91% | 90% | 98% | 0.847 | 0.919 | 3754 | 8237 |
 | `gpt5` | 90.7% (87.8%-93.6%) | 5.2% | 91% | 90% | 93% | 0.847 | 0.905 | 2173 | 4722 |
 | `claude` | 87.8% (84.1%-91.0%) | 5.2% | 86% | 87% | 96% | 0.809 | 0.867 | 1550 | 2879 |
-| `v45_phase3` ⭐ local | 87.9% (75.8%-97.0%) | 0.0% | — | 88% | — | 0.884 | 0.901 | 22 | 93 |
+| `v45_phase3` ⭐ local | 76.6% (63.8%-87.2%) | 0.0% | — | 77% | — | 0.780 | 0.845 | 9 | 22 |
 | `privacy_filter_ft_v6` | 80.9% (76.5%-84.9%) | 3.9% | 91% | 80% | 75% | 0.724 | 0.854 | 54 | 99 |
 | `privacy_filter_ft_v3` | 79.4% (75.1%-83.8%) | 7.8% | 91% | 79% | 70% | 0.689 | 0.823 | 118 | 237 |
 | `privacy_filter_ft_v2` | 78.0% (73.6%-82.3%) | 6.5% | 86% | 78% | 73% | 0.698 | 0.829 | 23 | 24 |
@@ -26,7 +26,7 @@ Sorted by **zero-leak rate** (the % of cases with PII where ALL gold spans were 
 | `gemini` | 0.00 | 1.00 | 1.00 | 0.89 | 1.00 | 1.00 | 1.00 | 1.00 | 0.99 | 1.00 | 0.90 | 0.75 | 0.79 |
 | `gpt5` | 0.00 | 1.00 | 1.00 | 0.91 | 1.00 | 1.00 | 1.00 | 1.00 | 0.95 | 1.00 | 1.00 | 0.80 | 0.79 |
 | `claude` | 0.00 | 1.00 | 1.00 | 0.92 | 1.00 | 1.00 | 1.00 | 0.86 | 0.90 | 1.00 | 1.00 | 0.70 | 0.93 |
-| `v45_phase3` | — | 1.00 | 1.00 | 1.00 | — | 1.00 | 1.00 | 1.00 | 0.75 | 0.67 | 1.00 | 1.00 | 0.33 |
+| `v45_phase3` | — | 1.00 | 1.00 | 1.00 | 0.00 | 1.00 | 1.00 | 0.73 | 0.93 | 0.67 | 1.00 | 1.00 | 0.33 |
 | `privacy_filter_ft_v6` | 0.00 | 0.83 | 0.55 | 0.86 | 0.00 | 0.98 | 0.95 | 0.95 | 0.87 | 0.92 | 0.68 | 1.00 | 0.79 |
 | `privacy_filter_ft_v3` | 0.00 | 0.75 | 0.65 | 0.81 | 0.00 | 1.00 | 0.95 | 0.91 | 0.86 | 0.92 | 0.68 | 1.00 | 0.79 |
 | `privacy_filter_ft_v2` | 0.00 | 0.83 | 0.50 | 0.79 | 0.00 | 1.00 | 0.91 | 0.91 | 0.84 | 0.92 | 0.63 | 1.00 | 0.79 |
@@ -38,4 +38,4 @@ Sorted by **zero-leak rate** (the % of cases with PII where ALL gold spans were 
 | `presidio` | 0.29 | 0.00 | 0.00 | 0.00 | 1.00 | 0.96 | 0.00 | 0.00 | 0.51 | 1.00 | 0.00 | 1.00 | 0.00 |
 | `regex` | 0.00 | 0.83 | 0.85 | 0.00 | 0.00 | 0.96 | 0.95 | 0.38 | 0.00 | 0.92 | 0.90 | 0.90 | 0.29 |
 
-_Bench size: 345 gold-bearing cases, 77 negatives. `v45_phase3` scored on the 33-case `sample.jsonl` sub-bench (the public-mirror subset) — wider CI than the full set. See [framework_coverage.md](framework_coverage.md) for per-framework (HIPAA / GDPR / CCPA / SOC 2 / PCI DSS / DPDPA) breakdowns, [METHODOLOGY.md](../METHODOLOGY.md) for scoring details, and [LIMITATIONS.md](../LIMITATIONS.md) for caveats._
+_Bench size: 345 gold-bearing cases, 77 negatives. `v45_phase3` scored on the 47-case `sample.jsonl` public sub-bench (now includes PHI / PCI / intl_id / Art. 9 / multilingual-name shards as tasters of the full private-bench coverage) — wider CI than the full set. Load-bearing claim is the 643-case private bench, where the same INT8-ONNX model lands at 87–90% zero-leak across every compliance framework (see [framework_coverage.md](framework_coverage.md)). [METHODOLOGY.md](../METHODOLOGY.md) for scoring details, [LIMITATIONS.md](../LIMITATIONS.md) for caveats._

@@ -2,7 +2,7 @@
 
 The canonical PII taxonomy used across all sub-benches.
 
-## The 12 canonical categories
+## The 13 canonical categories
 
 | Label | Description | Examples |
 |---|---|---|
@@ -15,9 +15,10 @@ The canonical PII taxonomy used across all sub-benches.
 | `private_repo` | Code repository identifiers in private contexts | `screenpipe/internal-tools`, `gracenote/staging` |
 | `private_handle` | Social or platform handles | `@marcus_chen`, `discord:notmarcus#1234` |
 | `private_channel` | Slack / Discord / Teams channel names that imply project or person | `#compai-tessera`, `#deal-acme-h2-2026` |
-| `private_id` | Government, account, employee, or transaction IDs | `SSN 123-45-6789`, `EMP-00482`, `INV-2026-0142` |
+| `private_id` | Government, account, employee, or transaction IDs | `SSN 123-45-6789`, `EMP-00482`, `INV-2026-0142`, card last-four / Aadhaar / NINO / CPF |
 | `private_date` | Dates that identify a person (DOB) or sensitive event | `DOB 1985-03-14`, `terminated 2025-09-12` |
 | `secret` | Passwords, API keys, JWTs, DB connection strings, private keys | `sk-proj-...`, `Bearer eyJhbGc...`, `-----BEGIN PRIVATE KEY-----` |
+| `private_sensitive` | Non-Safe-Harbor PHI / GDPR Art. 9 special category — diagnoses, medications, religion, sexual orientation, union/political affiliation, biometric, genetic | "HIV antibody results", "sertraline 50mg", "Bar mitzvah", "came out as lesbian" |
 
 ## Per-bench coverage
 
@@ -35,8 +36,9 @@ The canonical PII taxonomy used across all sub-benches.
 | private_id | ✅ | ⚠️ | ✅ |
 | private_date | ✅ | ⚠️ | ✅ |
 | secret | ✅ | ✅ | ✅ |
+| private_sensitive | ✅ | ⚠️ | ⚠️ |
 
-⚠️ = present in taxonomy but **not yet in image bench corpus**. v1 ships with this asymmetry documented; backport is on the post-v0.1 roadmap. See [LIMITATIONS.md](./LIMITATIONS.md).
+⚠️ = present in taxonomy but **not yet in image / trace bench corpus**. v1 ships with this asymmetry documented; backport is on the post-v0.1 roadmap. The text bench has a small public sample of `private_sensitive` cases (Art. 9 / non-Safe-Harbor PHI); the full multi-shard sensitive corpus lives in the private companion bench. See [LIMITATIONS.md](./LIMITATIONS.md).
 
 ## What each category does NOT include
 
@@ -46,13 +48,13 @@ The canonical PII taxonomy used across all sub-benches.
 - `private_handle` does **not** include `@everyone`, `@here`, or app-internal mentions. Only persistent identifiers.
 - `secret` does **not** include the *labels* of secrets ("API_KEY", "Bearer token") — only the secret values themselves.
 
-## Why these 12 and not more
+- `private_sensitive` does **not** include the person's name itself (that's `private_person`) — it captures the sensitive *context* (diagnosis text, medication name, ritual mention, orientation/religion phrase) attached to or identifying a person. Scope matches HIPAA's non-Safe-Harbor PHI bucket and GDPR Art. 9 (race / ethnic origin / religious or philosophical belief / political opinion / trade-union membership / genetic / biometric / health / sex life / sexual orientation).
 
-Earlier drafts had `private_account_number` and `private_medical_record` as separate categories. We collapsed:
-- `private_account_number` → `private_id` (one ID category, one secret category, simpler)
-- `private_medical_record` → `secret` for sensitive clinical data, `private_id` for MRN strings
+## Why this set and not more
 
-This matches the upstream OpenAI Privacy Filter taxonomy. Diverging would force us to retrain rather than fine-tune.
+Earlier drafts had `private_account_number` as a separate category. We collapsed it into `private_id` (one ID category, simpler). The original `private_medical_record` was split — MRN strings live in `private_id`, raw clinical data (free-text diagnoses, medication contexts) lives in `private_sensitive`.
+
+This matches the upstream OpenAI Privacy Filter taxonomy plus a 13th sensitive-category bucket aligned with HIPAA non-Safe-Harbor PHI and GDPR Art. 9. Diverging beyond this would force us to retrain rather than fine-tune.
 
 ## Adding a category
 

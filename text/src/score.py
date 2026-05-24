@@ -224,7 +224,8 @@ def write_leaderboard(results: list[dict]):
     BENCH_LABELS = {
         "private_person", "private_email", "private_phone", "private_address",
         "private_url", "private_date", "private_company", "private_repo",
-        "private_handle", "private_channel", "private_id", "secret", "account_number",
+        "private_handle", "private_channel", "private_id", "secret",
+        "private_sensitive", "account_number",
     }
     lines = ["# Leaderboard", ""]
     lines.append("Sorted by **zero-leak rate** (the % of cases with PII where ALL gold spans were caught — the metric that matters for privacy use cases). 95% bootstrap CI in brackets.")

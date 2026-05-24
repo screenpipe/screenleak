@@ -6,7 +6,7 @@ Higher is better across all three columns. "—" = adapter not run on that sub-b
 |---|---:|---:|---:|:---:|
 | `gpt5` | 90.7% | 3.2% | 64.0% | ❌ |
 | `claude` | 87.8% | 2.1% | 36.0% | ❌ |
-| `v45_phase3` | 87.9% | — | — | ✅ |
+| `v45_phase3` | 86.7%[†](#v45-fn) | — | — | ✅ |
 | `gemini` | 91.0% | 4.2% | 20.0% | ❌ |
 | `rfdetr` | — | 95.3% | — | ✅ |
 | `gcp_dlp` | 37.7% | 2.6% | — | ❌ |
@@ -47,5 +47,7 @@ Higher is better across all three columns. "—" = adapter not run on that sub-b
 _Per-sub-bench leaderboards: [text](../text/results/leaderboard.md), [image](../image/results/leaderboard.md), [trace](../trace/results/leaderboard.md)._
 
 _Compliance-framework breakdowns (HIPAA / GDPR / CCPA / SOC 2 / PCI DSS / DPDPA): [text/results/framework_coverage.md](../text/results/framework_coverage.md)._
+
+<a id="v45-fn"></a>† `v45_phase3` is scored on the 735-case private companion bench (mean of HIPAA / GDPR / CCPA / SOC 2 / PCI DSS / DPDPA zero-leak: 87.2 / 86.6 / 86.6 / 85.5 / 86.7 / 87.1). This is the framework-coverage metric — distinct from the 422-case text-bench overall zero-leak that the other adapters were run on. The 47-case public `sample.jsonl` zero-leak (a smaller, harder, framework-targeted sub-bench) is 76.6% (95% CI 63.8 – 87.2%); see [`../text/results/leaderboard.md`](../text/results/leaderboard.md).
 
 _See [METHODOLOGY.md](../METHODOLOGY.md) for scoring rules and [LIMITATIONS.md](../LIMITATIONS.md) for caveats._

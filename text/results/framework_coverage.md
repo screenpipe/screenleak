@@ -9,25 +9,39 @@ convention, collapsed onto the bench's canonical label space. See
 [`text/src/framework_coverage.py`](../src/framework_coverage.py) for
 the exact `FRAMEWORK_LABELS` dict.
 
-## On the 36-case public sample (`sample.jsonl`)
+## On the 51-case public sample (`sample.jsonl`)
+
+The public sample includes light tasters of the harder shards in the
+private bench: PHI cases (HIPAA-relevant patient/MRN/DOB combos), PCI
+cases (card last-fours, transaction IDs, full card numbers), three
+international ID formats (UK NINO, Indian Aadhaar, Brazil CPF), two
+multilingual person names (Korean, Arabic), two GDPR Art. 9 cases
+(religion + sexual orientation), and one sensitive-negative trap
+(public AIDS Day mention).
 
 | Adapter | HIPAA | GDPR | CCPA | SOC 2 | PCI DSS | DPDPA |
 |---|---:|---:|---:|---:|---:|---:|
-| `v45_phase3` ⭐ local | **100.0%** | **100.0%** | **100.0%** | **95.2%** | **90.0%** | **100.0%** |
-| `regex` | 66.7% | 63.0% | 63.0% | 66.7% | 30.0% | 71.4% |
-| `gcp_dlp` | 66.7% | 48.1% | 48.1% | 52.4% | 40.0% | 61.9% |
+| `v45_phase3` ⭐ local | **81.2%** | **85.4%** | **85.4%** | **80.0%** | **69.6%** | **82.9%** |
+| `gcp_dlp` | 43.8% | 36.6% | 36.6% | 37.1% | 30.4% | 42.9% |
+| `regex` | 37.5% | 41.5% | 41.5% | 40.0% | 13.0% | 42.9% |
+
+Even on the harder public sample, v45_phase3 leads `gcp_dlp` by 30–47
+points and `regex` by 28–57 points across every framework. The public
+sample is small (N = 23–41 per framework after filtering for in-scope
+cases), so CIs are wide; the load-bearing claim is the 643-case private
+bench below.
 
 Per-framework denominators on this sample:
 
 | | applicable cases |
 |---|---:|
-| HIPAA | 18 |
-| GDPR / CCPA | 27 |
-| SOC 2 | 21 |
-| PCI DSS | 10 |
-| DPDPA | 21 |
+| HIPAA | 32 |
+| GDPR / CCPA | 41 |
+| SOC 2 | 35 |
+| PCI DSS | 23 |
+| DPDPA | 35 |
 
-## On the 643-case private bench (screenpipe-pii-bench)
+## On the 735-case private bench (screenpipe-pii-bench)
 
 Reference numbers from the full private corpus — much larger N,
 includes the `intl_id` shard (24 country IDs), `special_category`
@@ -38,39 +52,50 @@ isn't cases). Reproducible from `screenpipe-pii-bench` →
 
 | Adapter | HIPAA | GDPR | CCPA | SOC 2 | PCI DSS | DPDPA |
 |---|---:|---:|---:|---:|---:|---:|
-| `v45_phase3` (INT8 ONNX, 278 MB) | 90.2% | 89.3% | 89.3% | 87.4% | 89.2% | 90.2% |
-| `v45_phase3` (fp32 PyTorch) | 88.6% | 88.2% | 88.2% | 85.8% | 87.7% | 88.7% |
-| `gliner2_pii_v45` (schema-driven, 0.3 B) | 86.9% | 84.4% | 84.4% | 86.8% | 87.9% | 86.3% |
-| `v43_student` (320 KB MLP + 22-rule cascade) | 75.5% | 77.4% | 77.4% | 77.9% | 81.0% | 76.8% |
+| `v45_phase3` (INT8 ONNX, 278 MB) | **87.2%** | **86.6%** | **86.6%** | **85.5%** | **86.7%** | **87.1%** |
+| `v45_phase3` (fp32 ONNX) | 87.0% | 86.6% | 86.6% | 85.1% | 86.4% | 86.8% |
 | `gcp_dlp` (cloud API, ~$1/1000 chars) | 69.5% | 63.5% | 63.5% | 59.0% | 60.7% | 66.8% |
-| `regex` (deterministic baseline) | 22.6% | 24.0% | 24.0% | 24.5% | 6.0% | 26.5% |
+| `regex` (deterministic baseline) | 20.6% | 23.1% | 23.1% | 22.0% | 5.5% | 25.2% |
+
+INT8 quantization is essentially free in accuracy (within noise of
+fp32) while cutting the model from 1.1 GB to 278 MB and CPU latency
+from ~30 ms to ~9 ms p50.
 
 ## How to read these tables
 
 A framework's zero-leak rate is the fraction of *applicable* cases
-where every in-scope gold span was caught. For `v45_phase3` on the
-private 643-case bench:
+where every in-scope gold span was caught. For `v45_phase3` (INT8
+ONNX) on the private 735-case bench:
 
-- **HIPAA 90.2%** = 349 of 387 cases with HIPAA-relevant PII had
-  all those spans redacted. The 38 leaks are dominated by
-  multilingual names + a few hard adversarial ID surfaces.
-- **PCI DSS 89.2%** = on 351 cases containing PCI-relevant data
-  (person / id / date / secret), 313 had every span caught.
+- **HIPAA 87.2%** = 369 of 423 cases with HIPAA-relevant PII had
+  all those spans redacted. The 54 leaks are dominated by
+  multilingual-name shards + a few hard adversarial ID surfaces.
+- **PCI DSS 86.7%** = on 383 cases containing PCI-relevant data
+  (person / id / date / secret), 332 had every span caught.
+- **Lead over `gcp_dlp`**: 17.7 (HIPAA) to 26.5 (SOC 2) points
+  across every framework. Lead over `regex`: 62 to 81 points.
 - **`sensitive_negative` shard** (15 cases that *look* like Art. 9
-  but contain no PII): `v45_phase3` returns 0 false positives. The
-  bench's main public oversmash claim is "Art. 9-relevant adapters
-  don't over-redact public-topic mentions of HIV / depression /
-  religion / etc."
+  but contain no PII): `v45_phase3` returns 0 false positives — the
+  bench's oversmash trap is held.
 
 ## What's missing
 
-- **`private_sensitive`** (Art. 9 / non-Safe-Harbor PHI) doesn't yet
-  appear in the public 36-case sample. The full private bench has 34
-  cases of it; `v45_phase3` scores 88% catch on those (vs 6% for
-  predecessor models). The public sample will be expanded with
-  sensitive-context cases in a future release of ScreenLeak.
-- The public sample is small enough that the 100% scores have wide CIs
-  — use the private-bench numbers as the load-bearing claim.
+- The public sample includes a light taster of each hard shard
+  (4 PHI cases, 3 PCI, 3 intl IDs, 2 multilingual names, 2 Art. 9,
+  1 sensitive-negative). The full shards live in the private companion
+  bench:
+  - `intl_id` (24 country IDs)
+  - `special_category` (34 GDPR Art. 9 cases)
+  - `multilingual_names` (30 non-Latin person names)
+  - `sensitive_negative` (15 looks-sensitive-but-isn't cases)
+  - `intl_id_adversarial` (20 adversarial perturbations of intl IDs)
+- The public sample is intentionally small (N ≈ 23–41 cases per
+  framework after filtering) — wide CIs. Use the private-bench numbers
+  for ranking.
+- `v45_phase3` has clear public-sample headroom on PHI-specific date
+  formats ("DOB 1985-03-14", "appt 2026-04-12") and a handful of
+  short-token IDs ("*4242", "MRN-7430182"). These are addressed in
+  v46 (in training).
 
 _See [`leaderboard.md`](leaderboard.md) for overall zero-leak and
 [`../METHODOLOGY.md`](../METHODOLOGY.md) for scoring rules._
