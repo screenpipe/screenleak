@@ -1,0 +1,140 @@
+{
+  "adapter": "v45_phase3",
+  "n_cases": 36,
+  "n_gold_cases": 33,
+  "n_negative_cases": 3,
+  "zero_leak_rate": 0.879,
+  "zero_leak_ci_95": [
+    0.758,
+    0.97
+  ],
+  "oversmash_rate": 0.0,
+  "macro_f1": 0.884,
+  "micro_f1": 0.901,
+  "micro_precision": 0.914,
+  "micro_recall": 0.889,
+  "per_label": {
+    "private_address": {
+      "tp": 3,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0
+    },
+    "private_channel": {
+      "tp": 3,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0
+    },
+    "private_company": {
+      "tp": 4,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0
+    },
+    "private_email": {
+      "tp": 3,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0
+    },
+    "private_handle": {
+      "tp": 3,
+      "fp": 1,
+      "fn": 0,
+      "precision": 0.75,
+      "recall": 1.0,
+      "f1": 0.857
+    },
+    "private_id": {
+      "tp": 3,
+      "fp": 1,
+      "fn": 0,
+      "precision": 0.75,
+      "recall": 1.0,
+      "f1": 0.857
+    },
+    "private_person": {
+      "tp": 3,
+      "fp": 0,
+      "fn": 1,
+      "precision": 1.0,
+      "recall": 0.75,
+      "f1": 0.857
+    },
+    "private_phone": {
+      "tp": 2,
+      "fp": 0,
+      "fn": 1,
+      "precision": 1.0,
+      "recall": 0.667,
+      "f1": 0.8
+    },
+    "private_repo": {
+      "tp": 4,
+      "fp": 0,
+      "fn": 0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0
+    },
+    "private_url": {
+      "tp": 3,
+      "fp": 1,
+      "fn": 0,
+      "precision": 0.75,
+      "recall": 1.0,
+      "f1": 0.857
+    },
+    "secret": {
+      "tp": 1,
+      "fp": 0,
+      "fn": 2,
+      "precision": 1.0,
+      "recall": 0.333,
+      "f1": 0.5
+    }
+  },
+  "by_difficulty": {
+    "medium": {
+      "n": 33,
+      "zero_leak_rate": 0.879
+    }
+  },
+  "latency_ms": {
+    "p50": 21.5,
+    "p95": 93.2,
+    "mean": 211.0
+  },
+  "leaked_examples": [
+    {
+      "id": "person_010",
+      "input": "Slack | DM: aidenpark",
+      "difficulty": "medium"
+    },
+    {
+      "id": "phone_004",
+      "input": "Arc | Verify number 4155550123",
+      "difficulty": "medium"
+    },
+    {
+      "id": "secret_004",
+      "input": "Arc | https://acme.com/?token=secret_abc123xyz_long_token",
+      "difficulty": "medium"
+    },
+    {
+      "id": "secret_003",
+      "input": "Cursor | AWS_SECRET_ACCESS_KEY=wJalrXUtnFEMI/K7MDENG/bPxRfiCYz",
+      "difficulty": "medium"
+    }
+  ],
+  "oversmash_examples": []
+}

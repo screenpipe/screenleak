@@ -6,6 +6,7 @@ Higher is better across all three columns. "—" = adapter not run on that sub-b
 |---|---:|---:|---:|:---:|
 | `gpt5` | 90.7% | 3.2% | 64.0% | ❌ |
 | `claude` | 87.8% | 2.1% | 36.0% | ❌ |
+| `v45_phase3` | 87.9% | — | — | ✅ |
 | `gemini` | 91.0% | 4.2% | 20.0% | ❌ |
 | `rfdetr` | — | 95.3% | — | ✅ |
 | `gcp_dlp` | 37.7% | 2.6% | — | ❌ |
@@ -32,6 +33,7 @@ Higher is better across all three columns. "—" = adapter not run on that sub-b
 | `gcp_dlp` | `Google Cloud DLP / Sensitive Data Protection (cloud API)` |
 | `regex_ocr` | `Tesseract OCR + 16 regex (deterministic baseline)` |
 | `presidio_image` | `microsoft/presidio-image-redactor` |
+| `v45_phase3` | `screenpipe/pii-redactor v45 phase 3 (xlm-roberta-base, 278 MB INT8 ONNX, local; HF: huggingface.co/screenpipe/pii-redactor/v45_phase3_onnx)` |
 | `privacy_filter_ft_v6` | `_unmapped — see adapter source_` |
 | `privacy_filter_ft_v3` | `screenpipe/pii-redactor v3 (fine-tune)` |
 | `privacy_filter_ft_v2` | `screenpipe/pii-redactor v2 (fine-tune)` |

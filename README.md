@@ -15,6 +15,7 @@ Blog: [screenpipe.github.io/screenleak](https://screenpipe.github.io/screenleak/
 |---|---:|---:|---:|
 | **GPT-5.5** | 90.7% | 3.2% | **64.0%** |
 | Claude Opus 4.7 | 87.8% | 2.1% | 36.0% |
+| `v45_phase3` *(local text fine-tune, 278 MB INT8 ONNX, xlm-roberta-base)* | **87.9%** | — | — |
 | Gemini 3.1 Pro Preview | **91.0%** | **4.2%** | 20.0% |
 | `rfdetr_v8` *(local image DETR, 12-class)* | — | **95.3%** | — |
 | `privacy_filter_ft_v6` *(local text fine-tune, 1.4B)* | 80.9% | — | — |
@@ -30,7 +31,7 @@ Three distinct failure modes, each measured separately. See [`results/unified_le
 
 ### Findings
 
-**1. Frontier APIs detect PII fine. Cloud DLP products don't.** On the text bench (window titles, AX nodes, OCR fragments), Gemini 3.1 Pro / GPT-5.5 / Claude Opus 4.7 all score 87.8–91.0% zero-leak, beating the strongest local model (`privacy_filter_ft_v6` at 80.9%) by 7–10 points. **Google Cloud DLP (37.7%) and Microsoft Presidio (35.4%) — the two flagship commercial PII products — barely beat a hand-rolled regex (33.9%).** They were built for documents (resumes, support tickets), not screen telemetry, and it shows: window-title fragments, code identifiers, and Slack/Outlook UI chrome fall outside their infoType taxonomy.
+**1. Frontier APIs detect PII fine. So can a 278 MB local model. Cloud DLP products don't.** On the text bench (window titles, AX nodes, OCR fragments), Gemini 3.1 Pro / GPT-5.5 / Claude Opus 4.7 all score 87.8–91.0% zero-leak. Our latest local model — `v45_phase3` (xlm-roberta-base, 278 MB INT8 ONNX, runs in 22 ms p50 on CPU and faster with Metal/DirectML GPU) — hits **87.9%**, statistically tied with Claude Opus 4.7 (87.8%) and within 3 points of the frontier. Earlier local fine-tunes lagged 7–10 points behind the frontier (`privacy_filter_ft_v6` at 80.9%); v45 closes the gap. **Google Cloud DLP (37.7%) and Microsoft Presidio (35.4%) — the two flagship commercial PII products — barely beat a hand-rolled regex (33.9%).** They were built for documents (resumes, support tickets), not screen telemetry, and it shows: window-title fragments, code identifiers, and Slack/Outlook UI chrome fall outside their infoType taxonomy.
 
 **2. Frontier APIs cannot locate PII in pixels — but a small specialized detector can.** On the image bench (n=190 PII-bearing rendered screenshots, IoU ≥ 0.30), every frontier model's zero-leak rate has a Wilson 95% CI that overlaps with the others *and* with a hand-rolled Tesseract + regex pipeline (2.6%). Only Gemini 3.1 Pro's upper CI bound (8.1%) reaches above 5%; Claude Opus 4.7, GPT-5.5, and Google Cloud DLP are statistically indistinguishable from `regex_ocr`. A locally fine-tuned RF-DETR (`rfdetr_v8`, ~28M-param DINOv2-S + LWDETR head, trained on the same generator distribution) scores **95.3%** zero-leak with a lower CI bound of 91.2% — decisively separated from every other adapter. Frontier vision models can *name* what they see but can't *draw boxes* tight enough to count at IoU 0.30; an in-distribution detector trained on synthetic screens dominates at a fraction of the cost.
 
