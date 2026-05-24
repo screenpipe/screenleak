@@ -38,4 +38,49 @@ Sorted by **zero-leak rate** (the % of cases with PII where ALL gold spans were 
 | `presidio` | 0.29 | 0.00 | 0.00 | 0.00 | 1.00 | 0.96 | 0.00 | 0.00 | 0.51 | 1.00 | 0.00 | 1.00 | 0.00 |
 | `regex` | 0.00 | 0.83 | 0.85 | 0.00 | 0.00 | 0.96 | 0.95 | 0.38 | 0.00 | 0.92 | 0.90 | 0.90 | 0.29 |
 
-_Bench size: 345 gold-bearing cases, 77 negatives. `v45_phase3` scored on the 47-case `sample.jsonl` public sub-bench (now includes PHI / PCI / intl_id / Art. 9 / multilingual-name shards as tasters of the full private-bench coverage) — wider CI than the full set. Load-bearing claim is the 643-case private bench, where the same INT8-ONNX model lands at 87–90% zero-leak across every compliance framework (see [framework_coverage.md](framework_coverage.md)). [METHODOLOGY.md](../METHODOLOGY.md) for scoring details, [LIMITATIONS.md](../LIMITATIONS.md) for caveats._
+## Deployment cost
+
+Zero-leak alone is half the picture — what does each model cost to *run*?
+The table below gives the **artifact size** (what you download or
+include in a Docker image), the **peak RSS** during inference, and the
+**p50 latency per redaction**.
+
+| Adapter | Local? | Model size | Peak RSS | p50 | p95 |
+|---|:---:|---:|---:|---:|---:|
+| `regex` | ✅ | < 1 MB | ~ 30 MB | < 1 ms | < 1 ms |
+| `presidio` | ✅ | ~ 200 MB | ~ 400 MB¹ | 6 ms | 8 ms |
+| `v45_phase3` ⭐ | ✅ | **278 MB** (INT8 ONNX) | **1.1 GB** (Rust `ort` runtime, CPU) | **9 ms** | **22 ms** |
+| `gliner_pii` | ✅ | ~ 500 MB¹ | ~ 1.5 GB¹ | 104 ms | 112 ms |
+| `opf_rs` | ✅ | ~ 1.4 GB¹ | ~ 6 GB¹ | < 1 ms² | < 1 ms² |
+| `privacy_filter_ft_v2` | ✅ | ~ 1.4 GB¹ | ~ 6 GB¹ | 23 ms | 24 ms |
+| `privacy_filter_ft_v3` | ✅ | ~ 1.4 GB¹ | ~ 6 GB¹ | 118 ms | 237 ms |
+| `privacy_filter` (base OPF) | ✅ | ~ 1.4 GB¹ | ~ 6 GB¹ | 22 ms | 23 ms |
+| `gcp_dlp` | ❌ cloud | 0 MB local | 0 MB local | 84 ms | 185 ms |
+| `claude` (claude-opus-4-7) | ❌ cloud | 0 MB local | 0 MB local | 1 550 ms | 2 879 ms |
+| `gpt5` (gpt-5.5) | ❌ cloud | 0 MB local | 0 MB local | 2 173 ms | 4 722 ms |
+| `gemini` (gemini-3.1-pro-preview) | ❌ cloud | 0 MB local | 0 MB local | 3 754 ms | 8 237 ms |
+
+`v45_phase3` is the only adapter that is **simultaneously** within 5
+points of frontier zero-leak on the framework-coverage tables, under
+300 MB on disk, and under 10 ms per redaction — fits in every laptop
+screenpipe targets. The 1.4 B `privacy_filter` / `opf_rs` family runs
+but needs ~6 GB resident, which knocks every laptop with 8 GB total
+RAM into swap. The cloud-API adapters trade local memory for cents
+per call and 1.5–8 seconds of latency per redaction.
+
+The `v45_phase3` row's Peak RSS comes from a real `/usr/bin/time -l`
+measurement of the [`v45_phase3_smoke`](https://github.com/screenpipe/screenpipe/blob/main/crates/screenpipe-redact/examples/v45_phase3_smoke.rs)
+example in the `screenpipe-redact` crate (`cargo run --release
+--example v45_phase3_smoke --features onnx-cpu`). 278 MB of that is
+the model on disk; the remaining ~ 830 MB is ONNX Runtime's working
+memory + embedding tables + tokenizer.
+
+¹ "~" values are documented from model card / well-known sizes, not
+re-measured this run. Re-measurement of every adapter is on the
+post-v0.1 roadmap.
+
+² `opf_rs`'s ~ 0 ms p50 is artefact of warm-up batching from the
+underlying Rust runtime; per-call latency on a long-running daemon is
+~ 5 ms.
+
+_Bench size: 345 gold-bearing cases, 77 negatives. `v45_phase3` scored on the 47-case `sample.jsonl` public sub-bench (now includes PHI / PCI / intl_id / Art. 9 / multilingual-name shards as tasters of the full private-bench coverage) — wider CI than the full set. Load-bearing claim is the 735-case private bench, where the same INT8-ONNX model lands at 85.5–87.2% zero-leak across every compliance framework (see [framework_coverage.md](framework_coverage.md)). [METHODOLOGY.md](../METHODOLOGY.md) for scoring details, [LIMITATIONS.md](../LIMITATIONS.md) for caveats._

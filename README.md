@@ -29,6 +29,22 @@ Blog: [screenpipe.github.io/screenleak](https://screenpipe.github.io/screenleak/
 
 Three distinct failure modes, each measured separately. See [`results/unified_leaderboard.md`](results/unified_leaderboard.md) for the full table with model-id mapping, plus the per-sub-bench leaderboards for CIs and category breakdowns. Per-compliance-framework breakdowns (HIPAA / GDPR / CCPA / SOC 2 / PCI DSS / DPDPA) in [`text/results/framework_coverage.md`](text/results/framework_coverage.md).
 
+### Deployment cost (text adapters)
+
+Zero-leak alone is half the picture. The other half is what a model costs to *run*:
+
+| Adapter | Local | Model size on disk | Peak RSS during inference | p50 latency |
+|---|:---:|---:|---:|---:|
+| `regex` | ✅ | < 1 MB | ~ 30 MB | < 1 ms |
+| `presidio` | ✅ | ~ 200 MB | ~ 400 MB | 6 ms |
+| `v45_phase3` ⭐ | ✅ | **278 MB** (INT8 ONNX) | **1.1 GB** (Rust `ort` runtime) | **9 ms** |
+| `gliner_pii` | ✅ | ~ 500 MB | ~ 1.5 GB | 104 ms |
+| `opf_rs` / `privacy_filter` family | ✅ | ~ 1.4 GB | ~ 6 GB | 1 – 120 ms |
+| `gcp_dlp` | ❌ cloud | 0 MB local | 0 MB local | 84 ms |
+| `claude` / `gpt5` / `gemini` | ❌ cloud | 0 MB local | 0 MB local | 1.5 – 3.8 s |
+
+`v45_phase3` is the only adapter within 5 points of frontier zero-leak that **also** stays under 300 MB on disk and 10 ms per redaction. The 1.4 B `privacy_filter` family is comparable in zero-leak but pushes 8 GB laptops into swap. Cloud APIs trade local memory for ~ 1.5 – 3.8 s per redaction and per-call billing. See [`text/results/leaderboard.md#deployment-cost`](text/results/leaderboard.md#deployment-cost) for the full per-adapter table and measurement methodology.
+
 <a id="v45-fn"></a>† `v45_phase3` is scored on the 735-case private companion bench (mean of HIPAA / GDPR / CCPA / SOC 2 / PCI DSS / DPDPA zero-leak — 87.2 / 86.6 / 86.6 / 85.5 / 86.7 / 87.1) — the framework-coverage metric, not the same 422-case `text/` bench-eval the other adapters were run on. The 47-case public `sample.jsonl` zero-leak (a smaller, harder sub-bench with framework-targeted cases) is 76.6% (CI 63.8 – 87.2%); see [`text/results/leaderboard.md`](text/results/leaderboard.md) and [`text/results/framework_coverage.md`](text/results/framework_coverage.md).
 
 ### Findings
