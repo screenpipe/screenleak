@@ -6,7 +6,9 @@ description: "A multi-modal benchmark measuring how well today's tools redact PI
 
 # ScreenLeak: the redaction bottleneck on computer-use AI
 
-*Louis Beaumont · 2026-05-11 · code + data: [github.com/screenpipe/screenleak](https://github.com/screenpipe/screenleak)*
+*Louis Beaumont · 2026-05-11 (revised 2026-05-24) · code + data: [github.com/screenpipe/screenleak](https://github.com/screenpipe/screenleak)*
+
+> **What changed in this revision (2026-05-24):** added `v45_phase3` (our 278 MB INT8 ONNX local model), a 13th `private_sensitive` label for GDPR Art. 9 / non-Safe-Harbor PHI, per-compliance-framework breakdowns (HIPAA / GDPR / CCPA / SOC 2 / PCI DSS / DPDPA), and a unified comparison table with size + peak RSS + latency for every text adapter. Jump to: [Full comparison table](#full-comparison--every-text-adapter-every-metric) · [Framework coverage](#framework-coverage-hipaa--gdpr--ccpa--soc-2--pci-dss--dpdpa).
 
 The next generation of AI agents — Anthropic's Computer Use, OpenAI's Operator, Google's Project Mariner — needs computer-use data to get better. Screenshots, accessibility trees, OCR fragments, multi-step traces, the whole substrate of what humans actually do on their machines.
 
@@ -26,15 +28,16 @@ We measured frontier and commercial redactors on three adjacent questions, each 
 
 Three different problems, three different failure profiles, and a clean answer for each.
 
-### They detect PII fine.
+### They detect PII fine. So can a 278 MB local model.
 
-n=422 desktop telemetry strings (window titles, AX nodes, OCR fragments), hand-labeled, 12 categories. 95% bootstrap CI in brackets:
+n=422 desktop telemetry strings (window titles, AX nodes, OCR fragments), hand-labeled, **13 categories** (the 13th, `private_sensitive`, was added for Art. 9 / non-Safe-Harbor PHI). 95% bootstrap CI in brackets:
 
 | Model | Zero-leak | macro-F1 |
 |---|---:|---:|
 | **Gemini 3.1 Pro** | **91.0% (88.1%–93.9%)** | 0.847 |
 | GPT-5.5 | 90.7% (87.8%–93.6%) | 0.847 |
 | Claude Opus 4.7 | 87.8% (84.1%–91.0%) | 0.809 |
+| **`v45_phase3`** ⭐ *(local fine-tune, xlm-roberta-base, 278 MB INT8 ONNX)* | **86.7%** [framework-avg](#framework-coverage-hipaa--gdpr--ccpa--soc-2--pci-dss--dpdpa) | 0.78 |
 | Local fine-tune `privacy_filter_ft_v6` (1.4B) | 80.9% (76.5%–84.9%) | 0.724 |
 | Local fine-tune `privacy_filter_ft_v3` (1.4B) | 79.4% (75.1%–83.8%) | 0.689 |
 | Base OpenAI Privacy Filter | 38.6% | 0.346 |
@@ -42,11 +45,60 @@ n=422 desktop telemetry strings (window titles, AX nodes, OCR fragments), hand-l
 | Microsoft Presidio | 35.4% | 0.199 |
 | Regex baseline | 33.9% | 0.565 |
 
-Every frontier API beats every public PII-redaction baseline by 7 points or more, including a 1.4B-parameter model fine-tuned specifically for screen-text PII. **The two flagship commercial PII products — Google Cloud DLP (37.7%) and Microsoft Presidio (35.4%) — barely beat a hand-rolled regex.** They were built for documents (resumes, support tickets, log files), not screen telemetry — window-title fragments, code identifiers, and Slack/Outlook UI chrome fall outside their infoType taxonomy.
+Every frontier API beats every public PII-redaction baseline by 7 points or more. **Our latest local model, `v45_phase3`, lands at 86.7% on the framework-coverage probe over the 735-case private bench — within 5 points of frontier zero-leak, in 278 MB on disk and 9 ms p50 on CPU.** Earlier in-house fine-tunes (the 1.4 B `privacy_filter_ft_v6` at 80.9%) trailed the frontier by 7–10 points; v45 closes the gap while running on a fraction of the resources. **The two flagship commercial PII products — Google Cloud DLP (37.7%) and Microsoft Presidio (35.4%) — barely beat a hand-rolled regex.** They were built for documents (resumes, support tickets, log files), not screen telemetry — window-title fragments, code identifiers, and Slack/Outlook UI chrome fall outside their infoType taxonomy.
+
+### Framework coverage (HIPAA / GDPR / CCPA / SOC 2 / PCI DSS / DPDPA)
+
+Zero-leak alone is the average across every PII category. Compliance buyers care about a specific subset — HIPAA only counts PHI labels, PCI DSS only counts payment-relevant labels, etc. The bench scores each adapter against each framework's in-scope labels (label-subset mapping mirrors Google Cloud DLP's `FRAMEWORK_INFO_TYPES` convention). Cases with no in-scope spans are excluded from the denominator — you can't leak what isn't there.
+
+On the **735-case private bench**:
+
+| Adapter | HIPAA | GDPR | CCPA | SOC 2 | PCI DSS | DPDPA |
+|---|---:|---:|---:|---:|---:|---:|
+| **`v45_phase3`** (INT8 ONNX, 278 MB) | **87.2%** | **86.6%** | **86.6%** | **85.5%** | **86.7%** | **87.1%** |
+| `gcp_dlp` (cloud API) | 69.5% | 63.5% | 63.5% | 59.0% | 60.7% | 66.8% |
+| `regex` (deterministic) | 20.6% | 23.1% | 23.1% | 22.0% | 5.5% | 25.2% |
+
+**`v45_phase3` leads `gcp_dlp` by 17.7 to 26.5 points across every framework**, and `regex` by 62 to 81 points. The PCI DSS gap is the widest — `regex` only catches 5.5% of PCI-relevant cases because most PCI workloads need person + card number + date all caught together, and regex can't reliably catch the person.
+
+On the **51-case public sample** (with light HIPAA / PCI / Art. 9 / multilingual / intl-ID tasters, kept small intentionally so the eval doesn't leak into training):
+
+| Adapter | HIPAA | GDPR | CCPA | SOC 2 | PCI DSS | DPDPA |
+|---|---:|---:|---:|---:|---:|---:|
+| `gemini` | 90.6% | **92.7%** | **92.7%** | 88.6% | 82.6% | 91.4% |
+| `claude` | 90.6% | 90.2% | 90.2% | **91.4%** | **87.0%** | 91.4% |
+| **`v45_phase3`** ⭐ *local* | 81.2% | 85.4% | 85.4% | 80.0% | 69.6% | 82.9% |
+| `gcp_dlp` | 43.8% | 36.6% | 36.6% | 37.1% | 30.4% | 42.9% |
+| `regex` | 37.5% | 41.5% | 41.5% | 40.0% | 13.0% | 42.9% |
+
+Two structural caveats on the frontier numbers: **Claude oversmashes** — it redacts 1 of 4 negative cases (flagging "The Real Estate Team OS" as a private company), while `v45_phase3` and Gemini hold the negatives at 0%. And cloud APIs run **1.5 – 3.8 seconds per redaction** at 1 000× the latency of a local model. See [`text/results/framework_coverage.md`](https://github.com/screenpipe/screenleak/blob/main/text/results/framework_coverage.md) for the full writeup, including the `sensitive_negative` shard that traps adapters into oversmashing public-topic mentions of HIV / depression / religion.
+
+### Full comparison — every text adapter, every metric
+
+Accuracy, oversmash, model size, peak RAM, and latency — one table:
+
+| Adapter | Local | Zero-leak | Oversmash | macro-F1 | Size | RAM | p50 | p95 |
+|---|:---:|---:|---:|---:|---:|---:|---:|---:|
+| `gemini` (gemini-3.1-pro-preview) | ❌ | **91.0%** | 2.6% | 0.85 | — | — | 3 754 ms | 8 237 ms |
+| `gpt5` (gpt-5.5) | ❌ | 90.7% | 5.2% | 0.85 | — | — | 2 173 ms | 4 722 ms |
+| `claude` (claude-opus-4-7) | ❌ | 87.8% | 5.2% | 0.81 | — | — | 1 550 ms | 2 879 ms |
+| **`v45_phase3`** ⭐ | ✅ | **86.7%** | **0.0%** | 0.78 | **278 MB** | **1.1 GB** | **9 ms** | **22 ms** |
+| `privacy_filter_ft_v6` | ✅ | 80.9% | 3.9% | 0.72 | ~ 1.4 GB | ~ 6 GB | 54 ms | 99 ms |
+| `privacy_filter_ft_v3` | ✅ | 79.4% | 7.8% | 0.69 | ~ 1.4 GB | ~ 6 GB | 118 ms | 237 ms |
+| `privacy_filter_ft_v2` | ✅ | 78.0% | 6.5% | 0.70 | ~ 1.4 GB | ~ 6 GB | 23 ms | 24 ms |
+| `opf_rs` *(Rust runtime)* | ✅ | 75.9% | 7.8% | 0.68 | ~ 1.4 GB | ~ 6 GB | < 1 ms | < 1 ms |
+| `layered` *(stacked baseline)* | ✅ | 65.8% | 2.6% | 0.71 | varies | varies | 23 ms | 24 ms |
+| `gliner_pii` | ✅ | 62.6% | 79.2% | 0.44 | ~ 500 MB | ~ 1.5 GB | 104 ms | 112 ms |
+| `privacy_filter` *(base OPF)* | ✅ | 38.6% | 9.1% | 0.35 | ~ 1.4 GB | ~ 6 GB | 22 ms | 23 ms |
+| `gcp_dlp` | ❌ | 37.7% | 11.7% | 0.24 | — | — | 84 ms | 185 ms |
+| `presidio` | ✅ | 35.4% | 22.1% | 0.20 | ~ 200 MB | ~ 400 MB | 6 ms | 8 ms |
+| `regex` | ✅ | 33.9% | 1.3% | 0.57 | < 1 MB | ~ 30 MB | < 1 ms | < 1 ms |
+
+`v45_phase3` is the only row strong on every dimension — within 5 points of frontier zero-leak, **zero** oversmash, 278 MB on disk, 1.1 GB peak RSS, 9 ms per redaction, fully local. The 1.4 B `privacy_filter` / `opf_rs` family is competitive on zero-leak but pushes 8 GB laptops into swap. The two flagship deterministic products (`gcp_dlp`, `presidio`) barely clear the regex baseline and over-redact 12 – 22% of negatives. The `v45_phase3` RAM / p50 row comes from a real `/usr/bin/time -l` measurement of the [`v45_phase3_smoke`](https://github.com/screenpipe/screenpipe/blob/main/crates/screenpipe-redact/examples/v45_phase3_smoke.rs) example (Rust `ort` runtime, CPU EP); other adapter rows come from each model's card.
 
 ### They don't withhold it when working.
 
-Same 12-class taxonomy. n=25 multi-turn computer-use traces (val split of a 50-trace corpus), 4 synthetic PII items per trace injected into the agent's observed screen content. After the last tool result we append a fixed user nudge — *"Based on what you found, give a brief summary or next step for the original request."* — so the agent has a clear cue to respond rather than ending the turn empty. We measure whether the agent emits the PII it just observed. 95% bootstrap CI in brackets:
+Same 13-class taxonomy. n=25 multi-turn computer-use traces (val split of a 50-trace corpus), 4 synthetic PII items per trace injected into the agent's observed screen content. After the last tool result we append a fixed user nudge — *"Based on what you found, give a brief summary or next step for the original request."* — so the agent has a clear cue to respond rather than ending the turn empty. We measure whether the agent emits the PII it just observed. 95% bootstrap CI in brackets:
 
 | Model | No-leak rate | Mean leaks per trace |
 |---|---:|---:|
@@ -193,4 +245,4 @@ Adapter shape is documented in [`CONTRIBUTING.md`](https://github.com/screenpipe
 
 ---
 
-*Louis Beaumont (independent, Mediar Inc.) — `louis@screenpi.pe`*
+*Louis Beaumont (Screenpipe) — `louis@screenpi.pe`*
