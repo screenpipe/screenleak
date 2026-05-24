@@ -46,4 +46,6 @@ Higher is better across all three columns. "—" = adapter not run on that sub-b
 
 _Per-sub-bench leaderboards: [text](../text/results/leaderboard.md), [image](../image/results/leaderboard.md), [trace](../trace/results/leaderboard.md)._
 
+_Compliance-framework breakdowns (HIPAA / GDPR / CCPA / SOC 2 / PCI DSS / DPDPA): [text/results/framework_coverage.md](../text/results/framework_coverage.md)._
+
 _See [METHODOLOGY.md](../METHODOLOGY.md) for scoring rules and [LIMITATIONS.md](../LIMITATIONS.md) for caveats._

@@ -27,7 +27,7 @@ Blog: [screenpipe.github.io/screenleak](https://screenpipe.github.io/screenleak/
 | `regex_ocr` *(Tesseract + 16 regex)* | — | 2.6% | — |
 | Hand-rolled regex | 33.9% | — | — |
 
-Three distinct failure modes, each measured separately. See [`results/unified_leaderboard.md`](results/unified_leaderboard.md) for the full table with model-id mapping, plus the per-sub-bench leaderboards for CIs and category breakdowns.
+Three distinct failure modes, each measured separately. See [`results/unified_leaderboard.md`](results/unified_leaderboard.md) for the full table with model-id mapping, plus the per-sub-bench leaderboards for CIs and category breakdowns. Per-compliance-framework breakdowns (HIPAA / GDPR / CCPA / SOC 2 / PCI DSS / DPDPA) in [`text/results/framework_coverage.md`](text/results/framework_coverage.md).
 
 ### Findings
 

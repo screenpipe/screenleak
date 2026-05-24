@@ -38,4 +38,4 @@ Sorted by **zero-leak rate** (the % of cases with PII where ALL gold spans were 
 | `presidio` | 0.29 | 0.00 | 0.00 | 0.00 | 1.00 | 0.96 | 0.00 | 0.00 | 0.51 | 1.00 | 0.00 | 1.00 | 0.00 |
 | `regex` | 0.00 | 0.83 | 0.85 | 0.00 | 0.00 | 0.96 | 0.95 | 0.38 | 0.00 | 0.92 | 0.90 | 0.90 | 0.29 |
 
-_Bench size: 345 gold-bearing cases, 77 negatives. `v45_phase3` scored on the 33-case `sample.jsonl` sub-bench (the public-mirror subset) — wider CI than the full set. See [METHODOLOGY.md](../METHODOLOGY.md) for scoring details and [LIMITATIONS.md](../LIMITATIONS.md) for caveats._
+_Bench size: 345 gold-bearing cases, 77 negatives. `v45_phase3` scored on the 33-case `sample.jsonl` sub-bench (the public-mirror subset) — wider CI than the full set. See [framework_coverage.md](framework_coverage.md) for per-framework (HIPAA / GDPR / CCPA / SOC 2 / PCI DSS / DPDPA) breakdowns, [METHODOLOGY.md](../METHODOLOGY.md) for scoring details, and [LIMITATIONS.md](../LIMITATIONS.md) for caveats._
