@@ -78,8 +78,8 @@ Each probe writes `framework_coverage_sample.md` next to its sub-bench leaderboa
 ## Moat
 
 - **Public**: 13 canonical labels, framework → label-subset mapping, probe scripts, small per-surface sample.
-- **Private**: 422-case text bench + adversarial / multilingual / Art. 9 / sensitive-negative shards (`screenpipe-pii-bench`), image generator + 2 206-image corpus (`screenpipe-pii-bench-image`), trace generator + 50-trace corpus + replay infrastructure, model weights, training mixtures.
+- **Private**: full val sets across the three sub-benches, the data pipelines that produce them, replay infrastructure, model weights, training mixtures.
 
-The compliance-coverage *claim* is verifiable from the public sample. The *load-bearing numbers* require the corpus. Researchers with a legitimate use case can request access at `louis@screenpi.pe`.
+The compliance-coverage *claim* is verifiable from the public sample. The *load-bearing numbers* require the private val sets. Researchers with a legitimate use case can request access at `louis@screenpi.pe`.
 
 _See [`METHODOLOGY.md`](../METHODOLOGY.md), [`THREAT_MODEL.md`](../THREAT_MODEL.md), [`LIMITATIONS.md`](../LIMITATIONS.md)._

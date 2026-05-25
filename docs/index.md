@@ -64,11 +64,11 @@ n=190 PII-bearing screenshots of real-shape apps. IoU ≥ 0.30. 95 % Wilson CI i
 
 Every frontier vision model sits under 5 %; CIs for Claude / GPT-5.5 / GCP DLP / `regex_ocr` overlap — statistically indistinguishable on this sample size. A 28 M-parameter RF-DETR (DINOv2-S + LWDETR head, 108 MB ONNX, ~ 66 ms p50 on Apple Silicon CoreML) decisively separates. Frontier vision can *name* what it sees — it can't *draw boxes* tight enough to count at IoU 0.30.
 
-**One important caveat**: the val split is image-disjoint but distribution-matched with the model's training set. The 95.3 % is what's reachable *when you can train on the synthetic-screen generator*, not a real-screen claim.
+**One important caveat**: the val split is in-distribution with the model's training (image-disjoint, no leaked PNGs, but same source). The 95.3 % is an upper bound under matched conditions, not a real-screen claim.
 
 ### 3. They detect, but they don't withhold.
 
-n=25 multi-turn computer-use traces, 4 synthetic PII items injected per trace into the agent's observed screen content. Did the agent emit the PII it just observed?
+n=25 multi-turn computer-use traces, with PII injected into the agent's observed screen content. Did the agent emit the PII it just observed?
 
 | Model | No-leak rate | Mean leaks/trace |
 |---|---:|---:|
@@ -83,7 +83,7 @@ n=25 multi-turn computer-use traces, 4 synthetic PII items injected per trace in
 Three different problems, three different failure profiles:
 
 1. **Text PII detection** is a recognition problem. Frontier models are excellent recognizers — they win by 7 – 50 points over public PII-redaction tools. A 278 MB local fine-tune closes the gap at 1 000× lower latency.
-2. **Image PII localization** is a grounding problem. Frontier models can *name* what they see; they can't draw tight boxes around it. A small specialized detector (RF-DETR, 28 M params) gets there at 95 %+ on synthetic screens.
+2. **Image PII localization** is a grounding problem. Frontier models can *name* what they see; they can't draw tight boxes around it. A small specialized detector (RF-DETR, 28 M params) gets there at 95 %+.
 3. **Trace PII withholding** is a behavioral problem. The same 91 %-text-detection model leaks PII 80 % of the time when it observes that PII inside a task.
 
 **Capability isn't disposition. Recognition isn't refusal.** That's the gap.
@@ -92,9 +92,9 @@ Published safety documentation from Anthropic, OpenAI, and Google all name on-sc
 
 ## Methodology, briefly
 
-- **Synthetic data only.** No real PII, no real users. Every name / email / phone / address / secret comes from deterministic generators with fictional name/company/host pools. (Most synthetic domains sit on plausibly-realistic `.com` / `.io` / `.vc` strings rather than RFC-6761 reserved domains — otherwise a redactor that learned "skip `.example`" would game the bench.) We use canonical placeholders where they exist (e.g. SSN `123-45-6789`).
-- **Layout-precise image labels.** Bounding boxes from `getBoundingClientRect()` on the rendered DOM via headless Chromium. Exact rectangle math, comfortably within the IoU ≥ 0.30 threshold.
-- **Strict gold integrity.** Every gold PII item is verified to appear verbatim in its trace at injection time. CI enforces.
+- **Synthetic data only.** No real PII, no real users. All names / emails / phones / IDs / secrets are fictional. Canonical placeholders where they exist (e.g. SSN `123-45-6789`).
+- **Pixel-precise gold** on the image bench. Comfortably within the IoU ≥ 0.30 match threshold.
+- **Strict gold integrity** — every gold item is verified to appear verbatim at injection time. CI enforces.
 - **CIs.** 95 % bootstrap on text + trace, 95 % Wilson on image. n=25 on trace, n=190 on image, n=345 on text — trace CIs are wide; ranking is directional, not decisive.
 - **Shared framework dict.** [`scoring/frameworks.py`](https://github.com/screenpipe/screenleak/blob/main/scoring/frameworks.py) is the single source of truth for HIPAA / GDPR / CCPA / SOC 2 / PCI DSS / DPDPA across all three sub-benches.
 
@@ -102,11 +102,11 @@ Full methodology, threat model, limitations, and per-category breakdowns are in 
 
 ## FAQ — the questions careful readers ask first
 
-**"How do I know you didn't train on the val set?"** The generator pipeline is deterministic from a seed; train/val splits come from disjoint seeds. CI verifies hash-disjointness. `rfdetr`'s 95.3 % measures **in-distribution recall** (same generator, held-out images) — explicitly an upper bound, not a real-screen claim. See `LIMITATIONS.md`.
+**"How do I know you didn't train on the val set?"** Train/val splits are exclusive and verified in CI. `rfdetr`'s 95.3 % is **in-distribution recall** (held-out images, same source), explicitly an upper bound, not a real-screen claim. See `LIMITATIONS.md`.
 
 **"Did you cherry-pick frontier-model versions?"** No: we benchmarked the latest production model from each lab at run time (`claude-opus-4-7`, `gpt-5.5`, `gemini-3.1-pro-preview`). Env vars let you re-run against any other version.
 
-**"Why is RF-DETR allowed to train on the bench distribution?"** Because that's the *deployable solution*. The bench asks "can today's tools redact PII from screen telemetry?" — a small in-distribution detector is a legitimate answer. The 90-point gap vs frontier vision is what's load-bearing; the absolute 95.3 % is bounded by in-distribution status. Frontier models / GCP DLP / Presidio were *not* trained on this distribution — they're the genuine zero-shot baseline.
+**"Why is RF-DETR allowed to be trained on the bench distribution?"** Because that's the *deployable solution*. The bench asks "can today's tools redact PII from screen telemetry?" — a small in-distribution detector is a legitimate answer. The 90-point gap vs frontier vision is load-bearing; the absolute 95.3 % is bounded by in-distribution status. Frontier models / GCP DLP / Presidio were *not* trained on this distribution — they're the genuine zero-shot baseline.
 
 **"Why three sub-benches?"** Because the failure modes separate. A model can ace text-PII at 91 % and leak in 80 % of traces. Single-bench framings miss the gap.
 
@@ -115,7 +115,7 @@ Full methodology, threat model, limitations, and per-category breakdowns are in 
 ## What this is not
 
 - **Not a capability benchmark.** A model that refuses to do anything will score 100 % no-leak and be useless. Use WebArena / OSWorld / GAIA for capability.
-- **Not a vendor pitch.** Scoring code + sample corpus are Apache 2.0 / CC-BY 4.0. The full corpus + generators sit in a private companion repo to prevent contamination of future evaluations, not for monetization.
+- **Not a vendor pitch.** Scoring code + sample corpus are Apache 2.0 / CC-BY 4.0. The full val sets sit in a private companion repo to prevent contamination of future evaluations, not for monetization.
 - **Not exhaustive.** v0 ships 25 trace val cases, 422 text cases, 221 image val cases. Numbers are directional. v0.1: adversarial prompt-injection split, larger trace corpus, image bench category coverage, multilingual, more adapters.
 
 ## Run it yourself

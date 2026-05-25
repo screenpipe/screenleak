@@ -77,10 +77,10 @@ Reported in milliseconds. Includes adapter pre/post-processing (tokenization, im
 
 ## Reproducibility
 
-- All bench corpora are deterministic. Synthetic-data generators use fixed seeds.
+- Public sample is included in the repo — anyone can re-run an adapter against it and verify the scoring kernel.
 - Adapter randomness: temperature=0 wherever the API allows. For models without a temperature knob, we report median of 3 runs.
-- Bootstrap seed: 42.
 - Hardware: noted per-row in the leaderboard.
+- Full val sets: private companion repo, access on request to `louis@screenpi.pe`.
 
 ## What we do NOT measure (in v1)
 

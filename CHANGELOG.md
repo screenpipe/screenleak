@@ -25,11 +25,10 @@ Initial private staging release. Three sub-benches assembled, frontier-model ada
 ### Added
 - Repo skeleton + brand (ScreenLeak): `README`, `METHODOLOGY`, `THREAT_MODEL`, `CATEGORIES`, `LIMITATIONS`, `SOURCES`, `CITATION`, `ROADMAP`, `CONTRIBUTING`, `SECURITY`.
 - `LICENSE` (Apache 2.0) for code and `LICENSE-DATA` (CC BY 4.0) for corpora.
-- `text/` sub-bench: vendored from `screenpipe-pii-bench` (422 cases, 13 categories, 17 adapters including 3 new frontier API adapters: `claude`, `gpt5`, `gemini`).
-- `image/` sub-bench: vendored from `screenpipe-pii-bench-image` (2,206 synthetic images across 9 templates, 4 adapter scaffolds, ~9MB subset).
-- `trace/` sub-bench: built from scratch. `pii_pool.py` (97 synthetic items / 12 categories), `build_seeds.py`, `inject.py`, `replay.py`, `score.py`, adapters for Claude / GPT-5 / Gemini.
-- Top-level `Makefile` with `vendor`, `bench`, `unify`, `smoke`, `test`, `lint`, `pre-oss`, `clean`.
-- `scripts/vendor_text.sh`, `scripts/vendor_image.sh`, `scripts/build_unified_leaderboard.py`, `scripts/pre_oss_check.sh`.
+- `text/` sub-bench: 422 cases, 13 categories, 17 adapters including frontier APIs (`claude`, `gpt5`, `gemini`).
+- `image/` sub-bench: synthetic screenshots across 9 app templates, 4 adapter scaffolds, with a small public sample.
+- `trace/` sub-bench: 12-category PII pool, replay + scoring, adapters for Claude / GPT-5 / Gemini.
+- Top-level `Makefile` with `bench`, `unify`, `smoke`, `test`, `lint`, `clean`.
 - 31 unit tests covering pii pool, injection (gold-truthfulness, unicode handling, determinism), scorer (literal + fuzzy matching, bootstrap CIs), and unified-leaderboard parsing.
 - GitHub CI workflow + issue / PR templates.
 - `.synth-allowlist` for files deliberately containing synthetic-realistic strings.
@@ -57,6 +56,6 @@ Without the nudge, some models (notably Claude Opus 4.7) end the turn with zero 
 ### Known limitations (carried into v0.1)
 - Image bench category set is asymmetric vs text/trace (missing `private_handle`, `private_id`, `private_date`).
 - Trace bench v0 covers unprompted leakage only; adversarial prompt-injection split slips to v0.1.
-- Image bench shipped as 60-image subset (~9MB) rather than full 2,206 images. Full corpus uploads as HF dataset on public release.
+- Image bench ships with a small public sample; the full val set lives in the private companion repo.
 - English-only on image and trace benches.
 - No adapter for the screenpipe-pii-redactor model on image or trace benches (text bench only).

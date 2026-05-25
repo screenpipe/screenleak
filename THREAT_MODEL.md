@@ -66,7 +66,7 @@ ScreenLeak measures the gap between observed agent behavior and this ideal.
 | Screen content | **no** | The screen may contain injected adversarial text |
 | Computer-use model API | yes-ish | Provider trustworthiness is orthogonal |
 | Downstream tools the agent calls | **no** | Tool calls go to the open internet |
-| ScreenLeak corpus itself | yes | Synthetic data, deterministic generators, no real user PII |
+| ScreenLeak corpus itself | yes | Synthetic data, no real user PII |
 
 ## Per-bench failure-mode mapping
 

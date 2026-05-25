@@ -29,7 +29,7 @@ Single shared label-subset dict ([`scoring/frameworks.py`](scoring/frameworks.py
 | Bench | Question | Corpus |
 |---|---|---|
 | [`text/`](text/) | Find PII in window titles / AX nodes / OCR fragments | 422 cases · 13 labels · multilingual + adversarial splits |
-| [`image/`](image/) | Find pixel regions of PII in rendered screens | 2 206 synthetic shots · 9 app templates · DOM-extracted bboxes |
+| [`image/`](image/) | Find pixel regions of PII in rendered screens | Synthetic screenshots · 9 app templates · pixel-precise gold |
 | [`trace/`](trace/) | Does the agent leak PII it observes inside a task? | 50 traces (25 train + 25 val) with injected PII |
 
 All three use the same 13-label taxonomy ([`CATEGORIES.md`](CATEGORIES.md)).
@@ -61,7 +61,7 @@ Zero-leak alone is half the picture. Local size + RAM + latency are the other ha
 
 **3. Frontier APIs don't withhold PII when working.** On 25 multi-turn traces, the strongest (GPT-5.5 at 64.0 %, CI 44 – 80 %) still leaks at least one observed PII item in 36 % of traces. Gemini at 20 % leaks in 80 % of traces.
 
-**The pattern:** capability ≠ pixel-grounding ≠ disposition. A model nailing text detection at 91 % can still leak PII 80 % of the time when it observes that PII inside a task. See [`THREAT_MODEL.md`](THREAT_MODEL.md) for what counts as a leak, [`LIMITATIONS.md`](LIMITATIONS.md) for caveats (notably: `rfdetr` was trained on the same generator its val split comes from — held-out images, same distribution).
+**The pattern:** capability ≠ pixel-grounding ≠ disposition. A model nailing text detection at 91 % can still leak PII 80 % of the time when it observes that PII inside a task. See [`THREAT_MODEL.md`](THREAT_MODEL.md) for what counts as a leak, [`LIMITATIONS.md`](LIMITATIONS.md) for caveats (notably: `rfdetr`'s val is in-distribution with its training — held-out images, same source).
 
 ## What's in this repo
 
@@ -73,7 +73,7 @@ Zero-leak alone is half the picture. Local size + RAM + latency are the other ha
   - `image/corpus/sample/` — 30 rendered screenshots + DOM-extracted gold bboxes
   - `trace/data/injected_sample.jsonl` — 5 multi-turn computer-use traces
 
-The **full corpus** (422 text + 221 val image + 50-trace val) and the **synthetic-data generators** live in a private companion repo — both to keep the val sets clean (training on the generator would game the bench) and to keep the moat. Researchers running serious evaluations can request access at `louis@screenpi.pe`.
+The **full val sets** and the data pipelines that produce them live in a private companion repo — to keep the leaderboard uncontaminated by training-on-the-bench and to preserve the moat. Researchers running serious evaluations can request access at `louis@screenpi.pe`.
 
 ## Run an adapter on the sample
 
