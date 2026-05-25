@@ -49,6 +49,11 @@ Every frontier API beats every public PII-redaction baseline by 7 points or more
 
 ### Framework coverage (HIPAA / GDPR / CCPA / SOC 2 / PCI DSS / DPDPA)
 
+> Same label-subset dict applies across text, image, and trace —
+> defined once in [`scoring/frameworks.py`](https://github.com/screenpipe/screenleak/blob/main/scoring/frameworks.py)
+> and imported by each surface's probe. **Unified cross-surface view**
+> in [`results/framework_coverage.md`](https://github.com/screenpipe/screenleak/blob/main/results/framework_coverage.md).
+
 Zero-leak alone is the average across every PII category. Compliance buyers care about a specific subset — HIPAA only counts PHI labels, PCI DSS only counts payment-relevant labels, etc. The bench scores each adapter against each framework's in-scope labels (label-subset mapping mirrors Google Cloud DLP's `FRAMEWORK_INFO_TYPES` convention). Cases with no in-scope spans are excluded from the denominator — you can't leak what isn't there.
 
 On the **735-case private bench**:

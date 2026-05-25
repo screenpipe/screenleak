@@ -43,38 +43,10 @@ DATA_DIR = ROOT / "data"
 RESULTS_DIR = ROOT / "results"
 sys.path.insert(0, str(ROOT / "src"))
 
-FRAMEWORK_LABELS: dict[str, frozenset[str]] = {
-    "hipaa": frozenset({
-        "private_person", "private_email", "private_phone", "private_address",
-        "private_url", "private_id", "private_date",
-        "private_sensitive",
-    }),
-    "gdpr": frozenset({
-        "private_person", "private_email", "private_phone", "private_address",
-        "private_url", "private_company", "private_handle", "private_channel",
-        "private_id", "private_date",
-        "private_sensitive",
-    }),
-    "ccpa": frozenset({
-        "private_person", "private_email", "private_phone", "private_address",
-        "private_url", "private_company", "private_handle", "private_channel",
-        "private_id", "private_date",
-        "private_sensitive",
-    }),
-    "soc2": frozenset({
-        "private_person", "private_email", "private_phone", "private_address",
-        "private_id", "private_date", "secret", "private_repo",
-        "private_sensitive",
-    }),
-    "pci_dss": frozenset({
-        "private_person", "private_id", "private_date", "secret",
-    }),
-    "dpdpa": frozenset({
-        "private_person", "private_email", "private_phone", "private_address",
-        "private_url", "private_handle", "private_id", "private_date",
-        "private_sensitive",
-    }),
-}
+# Shared FRAMEWORK_LABELS dict — single source of truth across text/image/trace
+# sub-benches. See screenleak-public/scoring/frameworks.py.
+sys.path.insert(0, str(ROOT.parent))
+from scoring.frameworks import FRAMEWORK_LABELS  # noqa: E402
 
 
 def load_cases() -> list[dict]:
