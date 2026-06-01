@@ -6,18 +6,18 @@ One label-subset dict ([`scoring/frameworks.py`](../scoring/frameworks.py)), thr
 
 `screenleak-public` ships the probes; the **private companion** runs them against the full corpus. These are the numbers customers and auditors should reference.
 
-### Headline — v45_phase3 (text) · rfdetr (image) · gpt5 (trace)
+### Headline — v45_phase3 (text) · rfdetr_v11 (image) · gpt5 (trace)
 
-| Framework | Text (v45_phase3) | Image (rfdetr) | Trace (gpt5) | Composite\* |
+| Framework | Text (v45_phase3) | Image (rfdetr_v11) | Trace (gpt5) | Composite\* |
 |---|---:|---:|---:|---:|
-| HIPAA   | 91.8% | 95.8% | 76.0% | **87.9%** |
-| GDPR    | 90.2% | 95.2% | 68.0% | 84.5% |
-| CCPA    | 90.2% | 95.2% | 68.0% | 84.5% |
-| SOC 2   | 88.0% | 95.7% | 68.0% | 83.9% |
-| PCI DSS | 88.7% | 96.8% | 78.3% | 87.9% |
-| DPDPA   | 91.6% | 95.8% | 72.0% | 86.5% |
+| HIPAA   | 91.8% | 98.8% | 76.0% | **88.9%** |
+| GDPR    | 90.2% | 98.8% | 68.0% | 85.7% |
+| CCPA    | 90.2% | 98.8% | 68.0% | 85.7% |
+| SOC 2   | 88.0% | 98.9% | 68.0% | 85.0% |
+| PCI DSS | 88.7% | 100.0% | 78.3% | 89.0% |
+| DPDPA   | 91.6% | 98.8% | 72.0% | 87.5% |
 
-\* Geometric mean across the three surfaces. Captures the *chain*: every surface where PII could leak is evaluated, and the weakest link sets the system's overall compliance posture.
+\* Mean across the three surfaces. Captures the *chain*: every surface where PII could leak is evaluated, and the trace surface — the weakest link — caps the system's overall compliance posture.
 
 ### Text — 422-case private bench
 
@@ -33,7 +33,7 @@ Denominators (in-scope applicable cases): HIPAA 231 · GDPR 306 · CCPA 306 · S
 
 | Adapter | HIPAA | GDPR | CCPA | SOC 2 | PCI DSS | DPDPA |
 |---|---:|---:|---:|---:|---:|---:|
-| **`rfdetr`** ⭐ local (108 MB ONNX) | **95.8%** | **95.2%** | **95.2%** | **95.7%** | **96.8%** | **95.8%** |
+| **`rfdetr_v11`** ⭐ local (~109 MB ONNX) | **98.8%** | **98.8%** | **98.8%** | **98.9%** | **100.0%** | **98.8%** |
 
 Denominators: HIPAA 168 · GDPR 168 · CCPA 168 · SOC 2 186 · PCI DSS 186 · DPDPA 168.
 
@@ -58,14 +58,14 @@ Smaller numbers, smaller corpus, same probes. Lets anyone confirm the scoring ke
 | text (51 cases) | `v45_phase3` | 81.2% | 85.4% | 85.4% | 80.0% | 69.6% | 82.9% |
 | text (51 cases) | `gcp_dlp` | 43.8% | 36.6% | 36.6% | 37.1% | 30.4% | 42.9% |
 | text (51 cases) | `regex` | 37.5% | 41.5% | 41.5% | 40.0% | 13.0% | 42.9% |
-| image (30 imgs) | `rfdetr` | 100.0% | 95.8% | 95.8% | 100.0% | 100.0% | 100.0% |
+| image (30 imgs) | `rfdetr_v11` | 100.0% | 100.0% | 100.0% | 100.0% | 100.0% | 100.0% |
 | trace | _replays not public_ | — | — | — | — | — | — |
 
 ## Run it yourself
 
 ```bash
 python text/src/framework_coverage.py  --adapter v45_phase3 gcp_dlp regex
-RFDETR_MODEL_PATH=~/.screenpipe/models/rfdetr_v8.onnx \
+RFDETR_MODEL_PATH=~/.screenpipe/models/rfdetr_v11.onnx \
   python image/src/framework_coverage.py --adapter rfdetr
 # trace requires replay JSONLs — produced by trace/src/replay.py in the private companion
 python trace/src/framework_coverage.py \

@@ -6,7 +6,7 @@ description: "A multi-modal benchmark measuring how well today's tools redact PI
 
 # ScreenLeak: the redaction bottleneck on computer-use AI
 
-*Louis Beaumont · 2026-05-11 (revised 2026-05-25) · code + data: [github.com/screenpipe/screenleak](https://github.com/screenpipe/screenleak)*
+*Louis Beaumont · 2026-05-11 (revised 2026-06-01) · code + data: [github.com/screenpipe/screenleak](https://github.com/screenpipe/screenleak)*
 
 The next generation of AI agents — Anthropic's Computer Use, OpenAI's Operator, Google's Project Mariner — needs computer-use data to get better. Screenshots, accessibility trees, OCR fragments, multi-step traces.
 
@@ -16,16 +16,16 @@ The capability question — *can the agent book a flight, fill a form?* — has 
 
 ## Headline — composite compliance coverage
 
-Each adapter scored on every surface where it operates. Composite = geometric mean across the three — the weakest-link compliance posture.
+Each adapter scored on every surface where it operates. Composite = mean across the three surfaces; the trace surface is the weakest link and caps every row.
 
-| Framework | Text (`v45_phase3`) | Image (`rfdetr`) | Trace (`gpt5`) | **Composite** |
+| Framework | Text (`v45_phase3`) | Image (`rfdetr_v11`) | Trace (`gpt5`) | **Composite** |
 |---|---:|---:|---:|---:|
-| HIPAA   | 91.8% | 95.8% | 76.0% | **87.9%** |
-| GDPR    | 90.2% | 95.2% | 68.0% | 84.5% |
-| CCPA    | 90.2% | 95.2% | 68.0% | 84.5% |
-| SOC 2   | 88.0% | 95.7% | 68.0% | 83.9% |
-| PCI DSS | 88.7% | 96.8% | 78.3% | **87.9%** |
-| DPDPA   | 91.6% | 95.8% | 72.0% | 86.5% |
+| HIPAA   | 91.8% | 98.8% | 76.0% | **88.9%** |
+| GDPR    | 90.2% | 98.8% | 68.0% | 85.7% |
+| CCPA    | 90.2% | 98.8% | 68.0% | 85.7% |
+| SOC 2   | 88.0% | 98.9% | 68.0% | 85.0% |
+| PCI DSS | 88.7% | 100.0% | 78.3% | **89.0%** |
+| DPDPA   | 91.6% | 98.8% | 72.0% | 87.5% |
 
 Same label-subset dict ([`scoring/frameworks.py`](https://github.com/screenpipe/screenleak/blob/main/scoring/frameworks.py)) applied across all three sub-benches. Numbers are zero-leak rates on the private val sets (422 text · 221 image · 25 trace). Full breakdown: [`results/framework_coverage.md`](https://github.com/screenpipe/screenleak/blob/main/results/framework_coverage.md).
 
@@ -54,7 +54,7 @@ n=190 PII-bearing screenshots of real-shape apps. IoU ≥ 0.30. 95 % Wilson CI i
 
 | Model | Zero-leak | Oversmash |
 |---|---:|---:|
-| **`rfdetr_v8`** (local, 28 M) | **95.3%** (91.2 – 97.5%) | 0.0% |
+| **`rfdetr_v11`** (local, 28 M) | **98.9%** (96.2 – 99.7%) | 0.0% |
 | Gemini 3.1 Pro | 4.2% (2.1 – 8.1%) | 9.7% |
 | GPT-5.5 | 3.2% (1.5 – 6.7%) | 22.6% |
 | Google Cloud DLP | 2.6% (1.1 – 6.0%) | 19.4% |
@@ -62,9 +62,9 @@ n=190 PII-bearing screenshots of real-shape apps. IoU ≥ 0.30. 95 % Wilson CI i
 | Claude Opus 4.7 | 2.1% (0.8 – 5.3%) | 35.5% |
 | Microsoft Presidio | 0.5% (0.1 – 2.9%) | 48.4% |
 
-Every frontier vision model sits under 5 %; CIs for Claude / GPT-5.5 / GCP DLP / `regex_ocr` overlap — statistically indistinguishable on this sample size. A 28 M-parameter RF-DETR (DINOv2-S + LWDETR head, 108 MB ONNX, ~ 66 ms p50 on Apple Silicon CoreML) decisively separates. Frontier vision can *name* what it sees — it can't *draw boxes* tight enough to count at IoU 0.30.
+Every frontier vision model sits under 5 %; CIs for Claude / GPT-5.5 / GCP DLP / `regex_ocr` overlap — statistically indistinguishable on this sample size. A 28 M-parameter RF-DETR (DINOv2-S + LWDETR head, ~ 109 MB ONNX, 512×512 input, ~ 120 ms p50 on Apple Silicon CoreML) decisively separates. Frontier vision can *name* what it sees — it can't *draw boxes* tight enough to count at IoU 0.30.
 
-**One important caveat**: the val split is in-distribution with the model's training (image-disjoint, no leaked PNGs, but same source). The 95.3 % is an upper bound under matched conditions, not a real-screen claim.
+**One important caveat**: the val split is in-distribution with the model's training (image-disjoint, no leaked PNGs, but same source). The 98.9 % is an upper bound under matched conditions, not a real-screen claim.
 
 ### 3. They detect, but they don't withhold.
 
@@ -83,7 +83,7 @@ n=25 multi-turn computer-use traces, with PII injected into the agent's observed
 Three different problems, three different failure profiles:
 
 1. **Text PII detection** is a recognition problem. Frontier models are excellent recognizers — they win by 7 – 50 points over public PII-redaction tools. A 278 MB local fine-tune closes the gap at 1 000× lower latency.
-2. **Image PII localization** is a grounding problem. Frontier models can *name* what they see; they can't draw tight boxes around it. A small specialized detector (RF-DETR, 28 M params) gets there at 95 %+.
+2. **Image PII localization** is a grounding problem. Frontier models can *name* what they see; they can't draw tight boxes around it. A small specialized detector (RF-DETR, 28 M params) gets there at ~99 %.
 3. **Trace PII withholding** is a behavioral problem. The same 91 %-text-detection model leaks PII 80 % of the time when it observes that PII inside a task.
 
 **Capability isn't disposition. Recognition isn't refusal.** That's the gap.
@@ -102,11 +102,11 @@ Full methodology, threat model, limitations, and per-category breakdowns are in 
 
 ## FAQ — the questions careful readers ask first
 
-**"How do I know you didn't train on the val set?"** Train/val splits are exclusive and verified in CI. `rfdetr`'s 95.3 % is **in-distribution recall** (held-out images, same source), explicitly an upper bound, not a real-screen claim. See `LIMITATIONS.md`.
+**"How do I know you didn't train on the val set?"** Train/val splits are exclusive and verified in CI. `rfdetr`'s 98.9 % is **in-distribution recall** (held-out images, same source), explicitly an upper bound, not a real-screen claim. See `LIMITATIONS.md`.
 
 **"Did you cherry-pick frontier-model versions?"** No: we benchmarked the latest production model from each lab at run time (`claude-opus-4-7`, `gpt-5.5`, `gemini-3.1-pro-preview`). Env vars let you re-run against any other version.
 
-**"Why is RF-DETR allowed to be trained on the bench distribution?"** Because that's the *deployable solution*. The bench asks "can today's tools redact PII from screen telemetry?" — a small in-distribution detector is a legitimate answer. The 90-point gap vs frontier vision is load-bearing; the absolute 95.3 % is bounded by in-distribution status. Frontier models / GCP DLP / Presidio were *not* trained on this distribution — they're the genuine zero-shot baseline.
+**"Why is RF-DETR allowed to be trained on the bench distribution?"** Because that's the *deployable solution*. The bench asks "can today's tools redact PII from screen telemetry?" — a small in-distribution detector is a legitimate answer. The 90-point gap vs frontier vision is load-bearing; the absolute 98.9 % is bounded by in-distribution status. Frontier models / GCP DLP / Presidio were *not* trained on this distribution — they're the genuine zero-shot baseline.
 
 **"Why three sub-benches?"** Because the failure modes separate. A model can ace text-PII at 91 % and leak in 80 % of traces. Single-bench framings miss the gap.
 

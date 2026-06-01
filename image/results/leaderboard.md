@@ -2,6 +2,8 @@
 
 Sorted by **per-image zero-leak** at IoU ≥ 0.3. Zero-leak = fraction of PII-bearing images where the redactor caught EVERY gold region (with a label that maps to the gold's). 95% Wilson confidence interval shown (n=190 PII-bearing images).
 
+> **Note (2026-06-01):** the published ScreenLeak headline now uses **`rfdetr_v11`** (realworld-augmented RF-DETR-Nano, 512×512): **98.9% zero-leak** (96.2–99.7%), 0.0% oversmash, 0.984 macro-F1, 0.991 micro-F1, ~120 ms p50. The `rfdetr` row below is the in-repo default checkpoint **v8** (320×320), kept for out-of-the-box reproduction until v11 is mirrored to the public HF repo. See [`CHANGELOG.md`](../../CHANGELOG.md).
+
 | Adapter | Zero-leak (95% CI) | Oversmash | Macro-F1 | Micro-F1 | p50 (ms) | p95 (ms) |
 |---|---:|---:|---:|---:|---:|---:|
 | `rfdetr` | 95.3% (91.2%–97.5%) | 0.0% | 0.871 | 0.970 | 285 | 432 |

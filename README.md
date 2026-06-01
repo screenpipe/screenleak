@@ -11,16 +11,16 @@ Blog: [screenpipe.github.io/screenleak](https://screenpipe.github.io/screenleak/
 
 ## Headline — composite framework coverage (text · image · trace)
 
-Each adapter is scored on every surface where it operates. The composite is the geometric mean across surfaces — the weakest-link compliance posture.
+Each adapter is scored on every surface where it operates. The composite is the mean across surfaces; the trace surface is the weakest link and caps every row.
 
-| Framework | Text<br>(`v45_phase3`) | Image<br>(`rfdetr`) | Trace<br>(`gpt5`) | **Composite** |
+| Framework | Text<br>(`v45_phase3`) | Image<br>(`rfdetr_v11`) | Trace<br>(`gpt5`) | **Composite** |
 |---|---:|---:|---:|---:|
-| HIPAA   | 91.8% | 95.8% | 76.0% | **87.9%** |
-| GDPR    | 90.2% | 95.2% | 68.0% | 84.5% |
-| CCPA    | 90.2% | 95.2% | 68.0% | 84.5% |
-| SOC 2   | 88.0% | 95.7% | 68.0% | 83.9% |
-| PCI DSS | 88.7% | 96.8% | 78.3% | **87.9%** |
-| DPDPA   | 91.6% | 95.8% | 72.0% | 86.5% |
+| HIPAA   | 91.8% | 98.8% | 76.0% | **88.9%** |
+| GDPR    | 90.2% | 98.8% | 68.0% | 85.7% |
+| CCPA    | 90.2% | 98.8% | 68.0% | 85.7% |
+| SOC 2   | 88.0% | 98.9% | 68.0% | 85.0% |
+| PCI DSS | 88.7% | 100.0% | 78.3% | **89.0%** |
+| DPDPA   | 91.6% | 98.8% | 72.0% | 87.5% |
 
 Single shared label-subset dict ([`scoring/frameworks.py`](scoring/frameworks.py)) applies across all three surfaces. Numbers are zero-leak rates on the private val sets (422 text · 221 image · 25 trace) — re-runnable from the public sample with the same probes. Full unified breakdown: [`results/framework_coverage.md`](results/framework_coverage.md).
 
@@ -57,7 +57,7 @@ Zero-leak alone is half the picture. Local size + RAM + latency are the other ha
 
 **1. A 278 MB local model matches frontier APIs on text. Cloud DLP products don't.** On the 422-case text bench, Gemini / GPT-5.5 / Claude all score 87.8 – 91.0 % zero-leak. `v45_phase3` averages 90 % across compliance frameworks at 9 ms p50 on CPU. Google Cloud DLP (37.7 %) and Microsoft Presidio (35.4 %) barely beat a hand-rolled regex (33.9 %) — they were built for documents, not screen telemetry.
 
-**2. Frontier vision can't draw boxes. A small specialized detector can.** On 190 PII-bearing screenshots at IoU ≥ 0.30, every frontier vision API sits below 5 % zero-leak with CIs that overlap each other and the Tesseract+regex baseline. A locally fine-tuned RF-DETR-Nano (28 M params, 108 MB) hits **95.3 %** with a lower CI bound of 91.2 % — decisively separated.
+**2. Frontier vision can't draw boxes. A small specialized detector can.** On 190 PII-bearing screenshots at IoU ≥ 0.30, every frontier vision API sits below 5 % zero-leak with CIs that overlap each other and the Tesseract+regex baseline. A locally fine-tuned RF-DETR-Nano (28 M params, ~109 MB, 512×512 input) hits **98.9 %** with a lower CI bound of 96.2 % — decisively separated.
 
 **3. Frontier APIs don't withhold PII when working.** On 25 multi-turn traces, the strongest (GPT-5.5 at 64.0 %, CI 44 – 80 %) still leaks at least one observed PII item in 36 % of traces. Gemini at 20 % leaks in 80 % of traces.
 

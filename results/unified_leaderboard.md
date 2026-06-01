@@ -8,7 +8,7 @@ Higher is better across all three columns. "—" = adapter not run on that sub-b
 | `claude` | 87.8% | 2.1% | 36.0% | ❌ |
 | `v45_phase3` | 86.7%[†](#v45-fn) | — | — | ✅ |
 | `gemini` | 91.0% | 4.2% | 20.0% | ❌ |
-| `rfdetr` | — | 95.3% | — | ✅ |
+| `rfdetr` | — | 98.9% | — | ✅ |
 | `gcp_dlp` | 37.7% | 2.6% | — | ❌ |
 | `regex_ocr` | — | 2.6% | — | ✅ |
 | `presidio_image` | — | 0.5% | — | ✅ |
@@ -29,7 +29,7 @@ Higher is better across all three columns. "—" = adapter not run on that sub-b
 | `gpt5` | `gpt-5.5` |
 | `claude` | `claude-opus-4-7` |
 | `gemini` | `gemini-3.1-pro-preview` |
-| `rfdetr` | `screenpipe/rfdetr_v8 (DINOv2-S + LWDETR, 12-class, local fine-tune)` |
+| `rfdetr` | `screenpipe/rfdetr_v11 (RF-DETR-Nano: DINOv2-S + LWDETR, 12-class, 512×512, realworld-augmented local fine-tune)` |
 | `gcp_dlp` | `Google Cloud DLP / Sensitive Data Protection (cloud API)` |
 | `regex_ocr` | `Tesseract OCR + 16 regex (deterministic baseline)` |
 | `presidio_image` | `microsoft/presidio-image-redactor` |

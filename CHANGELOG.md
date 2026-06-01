@@ -4,6 +4,18 @@ All notable changes to ScreenLeak.
 
 The format is loosely based on [Keep a Changelog](https://keepachangelog.com).
 
+## [2026-06-01] — image model rfdetr_v8 → rfdetr_v11
+
+### Changed
+- **Image bench now reports `rfdetr_v11`** (realworld-augmented RF-DETR-Nano, 512×512 input, ~109 MB ONNX) as the local detector, replacing `rfdetr_v8` (320×320). On the full 221-image private val: **98.9% zero-leak** (95% Wilson CI 96.2–99.7%), 0.0% oversmash, 0.984 macro-F1, 0.991 micro-F1, ~120 ms p50 on Apple Silicon CoreML (up from v8's ~66 ms — the larger 512² input trades speed for accuracy). Per-label recall on `private_company` / `private_person` / `secret` reaches 1.00.
+- Per-framework image coverage rises to 98.8–100.0% (HIPAA 98.8 · GDPR 98.8 · CCPA 98.8 · SOC 2 98.9 · PCI DSS 100.0 · DPDPA 98.8), lifting every composite row (HIPAA 87.9% → 88.9%, GDPR/CCPA 84.5% → 85.7%, SOC 2 83.9% → 85.0%, PCI DSS 87.9% → 89.0%, DPDPA 86.5% → 87.5%).
+- Public 30-image sample with `rfdetr_v11`: 100.0% across all six frameworks.
+- Composite prose corrected from "geometric mean" to "mean": the published composite values were always the arithmetic mean of the three surfaces; the prior "geometric" label did not match the numbers.
+
+### Notes
+- Text (`v45_phase3`) and trace (`gpt5` / `claude` / `gemini`) numbers are unchanged — same shipped models, same frozen val sets. Frontier rows were not re-run this pass (Claude/GPT API keys unavailable in the run environment); versions named inline remain `claude-opus-4-7` / `gpt-5.5` / `gemini-3.1-pro-preview` as measured 2026-05-25.
+- `rfdetr_v11` weights are not yet on the public HF mirror; external reproduction of the image numbers requires the v11 checkpoint (request access at `louis@screenpi.pe`).
+
 ## [Unreleased]
 
 ### Added
