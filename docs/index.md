@@ -14,6 +14,8 @@ That data is everywhere. Almost none of it can be moved, shared, logged, or fine
 
 The capability question — *can the agent book a flight, fill a form?* — has WebArena, OSWorld, GAIA, ScreenSpot. The redaction question — *can today's tools strip PII out so the data is shareable?* — has none. **ScreenLeak is the missing measurement.** Three surfaces, twelve systems, one taxonomy.
 
+> **▶ [Try the live demo]({{ site.baseurl }}/demo/)** — paste text or drop in a screenshot and watch the actual local models (`pii-redactor` + `rfdetr_v11`) black out PII **in your browser**. Nothing is uploaded — that's the whole point.
+
 ## Headline — composite compliance coverage
 
 Each adapter scored on every surface where it operates. Composite = mean across the three surfaces; the trace surface is the weakest link and caps every row.

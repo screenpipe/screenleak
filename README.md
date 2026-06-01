@@ -9,6 +9,8 @@
 
 Blog: [screenpipe.github.io/screenleak](https://screenpipe.github.io/screenleak/) · Contact: `louis@screenpi.pe`
 
+**▶ [Try the live demo](https://screenpipe.github.io/screenleak/demo/)** — redact text and screenshots **in your browser** with the actual local models (`pii-redactor` + `rfdetr_v11`). Nothing is uploaded.
+
 ## Headline — composite framework coverage (text · image · trace)
 
 Each adapter is scored on every surface where it operates. The composite is the mean across surfaces; the trace surface is the weakest link and caps every row.
