@@ -14,7 +14,11 @@ That data is everywhere. Almost none of it can be moved, shared, logged, or fine
 
 The capability question — *can the agent book a flight, fill a form?* — has WebArena, OSWorld, GAIA, ScreenSpot. The redaction question — *can today's tools strip PII out so the data is shareable?* — has none. **ScreenLeak is the missing measurement.** Three surfaces, twelve systems, one taxonomy.
 
-> **▶ [Try the live demo]({{ site.baseurl }}/demo/)** — paste text or drop in a screenshot and watch the actual local models (`pii-redactor` + `rfdetr_v11`) black out PII **in your browser**. Nothing is uploaded — that's the whole point.
+## Try it — redact PII in your browser
+
+Paste a captured string or drop in a screenshot and watch the actual local models black out PII, right here. Everything runs in your browser — nothing is uploaded.
+
+{% include demo-widget.html %}
 
 ## Headline — composite compliance coverage
 
