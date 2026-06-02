@@ -5,7 +5,7 @@
 [![ci](https://img.shields.io/badge/ci-pytest%20%2B%20ruff-black)](.github/workflows/ci.yml)
 [![python](https://img.shields.io/badge/python-3.10%2B-blue)](pyproject.toml)
 
-> **A multi-modal benchmark measuring how well today's tools redact PII from screen telemetry, rendered screenshots, and multi-step computer-use traces.**
+> **A multi-modal benchmark measuring how well today's tools redact PII from screen telemetry, screenshots, and multi-step computer-use traces.**
 
 Blog: [screenpipe.github.io/screenleak](https://screenpipe.github.io/screenleak/) · Contact: `louis@screenpi.pe`
 

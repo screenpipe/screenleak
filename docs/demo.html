@@ -28,12 +28,13 @@ Arc | PR opened on github.com/acmeco/widget-engine</textarea>
       <button id="text-run" class="btn">Redact text</button>
       <span id="text-status" class="status"></span>
     </div>
+    <div class="cats" id="cat-toggles"><span class="cats-label">redact:</span></div>
     <div id="text-output" class="output" hidden></div>
   </section>
 
   <section class="demo-card">
     <h2>Image redactor <span class="tag">rfdetr_v11 · 109&nbsp;MB</span></h2>
-    <p class="muted">Finds and blacks out PII <em>regions</em> in a screenshot. Upload your own or use the sample. <em>Trained on rendered app screenshots — 98.9% in-distribution; on out-of-distribution images it can miss or over-box (the in-distribution caveat from the <a href="{{ site.baseurl }}/">writeup</a>, live).</em></p>
+    <p class="muted">Finds and blacks out PII <em>regions</em> in a screenshot — names, IDs, addresses, secrets and more. Use the sample or upload your own. <em>Works best on clean, standard app UIs; unusual or low-quality screens may be missed or over-boxed.</em></p>
     <div class="row">
       <button id="img-example" class="btn ghost">Use sample</button>
       <label class="btn ghost">Upload screenshot<input id="img-file" type="file" accept="image/*" hidden></label>
@@ -45,7 +46,34 @@ Arc | PR opened on github.com/acmeco/widget-engine</textarea>
 
 </div>
 
-<p class="muted small">Text demo uses <a href="https://github.com/huggingface/transformers.js">transformers.js</a>; image uses <a href="https://onnxruntime.ai/docs/tutorials/web/">onnxruntime-web</a>. Models: <a href="https://huggingface.co/screenpipe/pii-redactor">pii-redactor</a> · <a href="https://huggingface.co/screenpipe/pii-image-redactor">pii-image-redactor</a>. Synthetic sample only — no real PII. On a benchmark of these surfaces, the text model lands within 5&nbsp;pts of frontier APIs and the image model hits 98.9% region zero-leak — see the <a href="{{ site.baseurl }}/">writeup</a>.</p>
+<h2 class="bench-h">Zero-leak rate — local models vs frontier &amp; cloud</h2>
+<div class="bench-grid">
+  <div class="bench">
+    <div class="bench-title">Text PII<span class="bench-sub">desktop telemetry strings</span></div>
+    <table>
+      <tr><td>Gemini 3.1 Pro</td><td class="num">91.0%</td></tr>
+      <tr><td>GPT-5.5</td><td class="num">90.7%</td></tr>
+      <tr><td>Claude Opus 4.7</td><td class="num">87.8%</td></tr>
+      <tr class="local"><td>pii-redactor · local</td><td class="num">86.7%</td></tr>
+      <tr><td>Google Cloud DLP</td><td class="num">37.7%</td></tr>
+      <tr><td>Microsoft Presidio</td><td class="num">35.4%</td></tr>
+    </table>
+  </div>
+  <div class="bench">
+    <div class="bench-title">Image PII regions<span class="bench-sub">IoU ≥ 0.30</span></div>
+    <table>
+      <tr class="local"><td>pii-image-redactor · local</td><td class="num">98.9%</td></tr>
+      <tr><td>Gemini 3.1 Pro</td><td class="num">4.2%</td></tr>
+      <tr><td>GPT-5.5</td><td class="num">3.2%</td></tr>
+      <tr><td>Google Cloud DLP</td><td class="num">2.6%</td></tr>
+      <tr><td>Claude Opus 4.7</td><td class="num">2.1%</td></tr>
+      <tr><td>Microsoft Presidio</td><td class="num">0.5%</td></tr>
+    </table>
+  </div>
+</div>
+<p class="muted small">Zero-leak = share of items where <em>every</em> PII span (text) or region (image) is caught. Local models run fully offline (~10&nbsp;ms text · ~120&nbsp;ms image). Full methodology, confidence intervals &amp; per-framework breakdowns in the <a href="{{ site.baseurl }}/">writeup</a> and <a href="https://github.com/screenpipe/screenleak/blob/main/results/unified_leaderboard.md">leaderboard</a>.</p>
+
+<p class="muted small">Text demo uses <a href="https://github.com/huggingface/transformers.js">transformers.js</a>; image uses <a href="https://onnxruntime.ai/docs/tutorials/web/">onnxruntime-web</a>. Models: <a href="https://huggingface.co/screenpipe/pii-redactor">pii-redactor</a> · <a href="https://huggingface.co/screenpipe/pii-image-redactor">pii-image-redactor</a>. Synthetic sample only — no real PII.</p>
 
 <style>
 /* this page ships its own <style>, so these only apply on /demo/ —
@@ -75,6 +103,23 @@ Arc | PR opened on github.com/acmeco/widget-engine</textarea>
 .output.show-labels .pii{margin-bottom:.6rem}
 .canvas-wrap{margin-top:.95rem;overflow:auto;max-height:640px;border-radius:10px}
 #img-canvas{max-width:100%;border:1px solid rgba(128,128,128,.3);border-radius:10px;display:none}
+/* category toggles (text demo) */
+.cats{display:flex;flex-wrap:wrap;gap:.4rem;align-items:center;margin:.75rem 0 .15rem}
+.cats-label{font:500 .8rem/1 var(--font-mono,monospace);opacity:.55;margin-right:.15rem}
+.cat{font:500 .76rem/1 var(--font-mono,monospace);border:1px solid rgba(128,128,128,.3);border-radius:999px;padding:.32rem .62rem;cursor:pointer;background:transparent;color:inherit;opacity:.4;text-decoration:line-through}
+.cat.on{opacity:1;background:rgba(128,128,128,.14);border-color:rgba(128,128,128,.55);text-decoration:none}
+.cat:hover{border-color:rgba(128,128,128,.7)}
+/* benchmark tables */
+.bench-h{font-size:1.25rem;margin:2.6rem 0 .2rem}
+.bench-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.6rem;margin:1rem 0 .5rem;max-width:100%}
+@media(max-width:880px){.bench-grid{grid-template-columns:1fr}}
+.bench-title{font:600 1rem/1.3 var(--font-sans,sans-serif)}
+.bench-sub{font:400 .76rem/1 var(--font-mono,monospace);opacity:.55;margin-left:.4rem}
+.bench table{width:100%;border-collapse:collapse;font-size:.92rem;margin:.45rem 0 0}
+.bench td{padding:.42rem .55rem;border-bottom:1px solid rgba(128,128,128,.18)}
+.bench td.num{text-align:right;font-family:var(--font-mono,monospace)}
+.bench tr.local td{background:rgba(37,99,235,.1);font-weight:600}
+.bench tr.local td:first-child::before{content:"★ ";color:#2563eb}
 </style>
 
 <script type="module">
@@ -91,6 +136,39 @@ const EXAMPLES = [
 ];
 const exWrap = $("text-examples");
 EXAMPLES.forEach(t => { const b=document.createElement("button"); b.textContent = t.length>42?t.slice(0,42)+"…":t; b.title=t; b.onclick=()=>{ $("text-input").value=t; }; exWrap.appendChild(b); });
+
+// category toggles — the text model emits reliable per-category labels, so let
+// users choose which to black out. (The image model is a localizer; its
+// per-region class isn't reliable on arbitrary screens, so it redacts all.)
+const CATS=[
+  ["secret","secrets"],["private_person","names"],["private_email","emails"],
+  ["private_phone","phones"],["private_id","IDs"],["private_address","addresses"],
+  ["private_url","URLs"],["private_company","companies"],["private_repo","repos"],
+  ["private_handle","handles"],["private_channel","channels"],["private_date","dates"],
+];
+const selectedCats=new Set(CATS.map(c=>c[0]));
+const catWrap=$("cat-toggles");
+CATS.forEach(([key,label])=>{
+  const b=document.createElement("button");
+  b.type="button"; b.className="cat on"; b.textContent=label;
+  b.onclick=()=>{ if(selectedCats.has(key)){selectedCats.delete(key);b.classList.remove("on");} else {selectedCats.add(key);b.classList.add("on");} renderText(); };
+  catWrap.appendChild(b);
+});
+
+let lastText=null; // { lines:[{line,spans}], ms } — kept so toggles re-render without re-running the model
+function renderText(){
+  if(!lastText) return;
+  const out=$("text-output"), st=$("text-status");
+  let shown=0;
+  const htmlLines=lastText.lines.map(({line,spans})=>{
+    if(!line.trim()) return "";
+    const keep=spans.filter(s=>selectedCats.has(s.label));
+    shown+=keep.length;
+    return renderRedacted(line, keep);
+  });
+  out.hidden=false; out.classList.add("show-labels"); out.innerHTML=htmlLines.join("\n");
+  st.textContent=`${shown} span(s) redacted · ${lastText.ms} ms`;
+}
 
 let textPipe = null;
 async function loadText(setStatus){
@@ -138,26 +216,24 @@ function renderRedacted(text, spans){
   html+=esc(text.slice(i)); return html;
 }
 $("text-run").onclick = async () => {
-  const btn=$("text-run"), st=$("text-status"), out=$("text-output");
+  const btn=$("text-run"), st=$("text-status");
   btn.disabled=true;
   try{
     const pipe=await loadText(m=>st.textContent=m);
     st.textContent="redacting…";
     // screenpipe redacts each captured fragment independently; mirror that by
-    // running the model per line (its training distribution is single short
-    // telemetry strings — one blob of many entities degrades recall).
+    // running the model per line (its distribution is single short telemetry
+    // strings — one blob of many entities degrades recall).
     const lines=$("text-input").value.split("\n");
     const t0=performance.now();
-    let total=0; const htmlLines=[];
+    const collected=[];
     for(const line of lines){
-      if(!line.trim()){ htmlLines.push(""); continue; }
+      if(!line.trim()){ collected.push({line, spans:[]}); continue; }
       const res=await pipe(line);
-      const spans=reconstructSpans(res, line);
-      total+=spans.length;
-      htmlLines.push(renderRedacted(line, spans));
+      collected.push({line, spans:reconstructSpans(res, line)});
     }
-    out.hidden=false; out.classList.add("show-labels"); out.innerHTML=htmlLines.join("\n");
-    st.textContent=`${total} span(s) redacted · ${Math.round(performance.now()-t0)} ms`;
+    lastText={ lines:collected, ms:Math.round(performance.now()-t0) };
+    renderText(); // respects the current category toggles
   }catch(e){ st.textContent="error: "+(e.message||e); console.error(e); }
   finally{ btn.disabled=false; }
 };
