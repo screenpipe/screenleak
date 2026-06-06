@@ -1,18 +1,12 @@
 ---
 layout: default
-title: "ScreenLeak: the redaction bottleneck on computer-use AI"
+title: "ScreenLeak: PII redaction on screen recording telemetry"
 description: "A multi-modal benchmark measuring how well today's tools redact PII from screen telemetry, screenshots, and computer-use traces."
 ---
 
-# ScreenLeak: the redaction bottleneck on computer-use AI
+# ScreenLeak: PII redaction on screen recording telemetry
 
-*Louis Beaumont · 2026-05-11 (revised 2026-06-01) · code + data: [github.com/screenpipe/screenleak](https://github.com/screenpipe/screenleak)*
-
-The next generation of AI agents — Anthropic's Computer Use, OpenAI's Operator, Google's Project Mariner — needs computer-use data to get better. Screenshots, accessibility trees, OCR fragments, multi-step traces.
-
-That data is everywhere. Almost none of it can be moved, shared, logged, or fine-tuned on — every frame is full of names, emails, customer IDs, internal hostnames, API keys, channel names. **PII is the bottleneck on the entire computer-use research pipeline.**
-
-The capability question — *can the agent book a flight, fill a form?* — has WebArena, OSWorld, GAIA, ScreenSpot. The redaction question — *can today's tools strip PII out so the data is shareable?* — has none. **ScreenLeak is the missing measurement.** Three surfaces, twelve systems, one taxonomy.
+A multi-modal benchmark measuring how well today's tools redact PII from screen telemetry, screenshots, and computer-use traces
 
 ## Try it — redact PII in your browser
 
@@ -68,33 +62,6 @@ n=190 PII-bearing screenshots of real-shape apps. IoU ≥ 0.30. 95 % Wilson CI i
 | Claude Opus 4.7 | 2.1% (0.8 – 5.3%) | 35.5% |
 | Microsoft Presidio | 0.5% (0.1 – 2.9%) | 48.4% |
 
-Every frontier vision model sits under 5 %; CIs for Claude / GPT-5.5 / GCP DLP / `regex_ocr` overlap — statistically indistinguishable on this sample size. A 28 M-parameter RF-DETR (DINOv2-S + LWDETR head, ~ 109 MB ONNX, 512×512 input, ~ 120 ms p50 on Apple Silicon CoreML) decisively separates. Frontier vision can *name* what it sees — it can't *draw boxes* tight enough to count at IoU 0.30.
-
-**One important caveat**: the val split is in-distribution with the model's training (image-disjoint, no leaked PNGs, but same source). The 98.9 % is an upper bound under matched conditions, not a real-screen claim.
-
-### 3. They detect, but they don't withhold.
-
-n=25 multi-turn computer-use traces, with PII injected into the agent's observed screen content. Did the agent emit the PII it just observed?
-
-| Model | No-leak rate | Mean leaks/trace |
-|---|---:|---:|
-| **GPT-5.5** | **64.0%** (44.0 – 80.0%) | 0.64 |
-| Claude Opus 4.7 | 36.0% (16.0 – 56.0%) | 1.12 |
-| Gemini 3.1 Pro Preview | 20.0% (4.0 – 36.0%) | 1.28 |
-
-**Every frontier model that detects text PII at > 87 % accuracy fails to withhold it 36 – 80 % of the time when asked to summarize the screen.** Per-category: `private_company` leaks 50 – 100 % across all three models; names 50 – 83 %; repo references 43 – 100 %. The clean categories (URLs, secret-shaped strings) are clean because every frontier model is trained hard to refuse `sk-...` / `Bearer ...` patterns. Names of people, customers, project channels just flow through.
-
-## The pattern
-
-Three different problems, three different failure profiles:
-
-1. **Text PII detection** is a recognition problem. Frontier models are excellent recognizers — they win by 7 – 50 points over public PII-redaction tools. A 278 MB local fine-tune closes the gap at 1 000× lower latency.
-2. **Image PII localization** is a grounding problem. Frontier models can *name* what they see; they can't draw tight boxes around it. A small specialized detector (RF-DETR, 28 M params) gets there at ~99 %.
-3. **Trace PII withholding** is a behavioral problem. The same 91 %-text-detection model leaks PII 80 % of the time when it observes that PII inside a task.
-
-**Capability isn't disposition. Recognition isn't refusal.** That's the gap.
-
-Published safety documentation from Anthropic, OpenAI, and Google all name on-screen disclosure as an open concern. We measured the gap. The data: [github.com/screenpipe/screenleak](https://github.com/screenpipe/screenleak).
 
 ## Methodology, briefly
 
@@ -105,18 +72,6 @@ Published safety documentation from Anthropic, OpenAI, and Google all name on-sc
 - **Shared framework dict.** [`scoring/frameworks.py`](https://github.com/screenpipe/screenleak/blob/main/scoring/frameworks.py) is the single source of truth for HIPAA / GDPR / CCPA / SOC 2 / PCI DSS / DPDPA across all three sub-benches.
 
 Full methodology, threat model, limitations, and per-category breakdowns are in the repo.
-
-## FAQ — the questions careful readers ask first
-
-**"How do I know you didn't train on the val set?"** Train/val splits are exclusive and verified in CI. `rfdetr`'s 98.9 % is **in-distribution recall** (held-out images, same source), explicitly an upper bound, not a real-screen claim. See `LIMITATIONS.md`.
-
-**"Did you cherry-pick frontier-model versions?"** No: we benchmarked the latest production model from each lab at run time (`claude-opus-4-7`, `gpt-5.5`, `gemini-3.1-pro-preview`). Env vars let you re-run against any other version.
-
-**"Why is RF-DETR allowed to be trained on the bench distribution?"** Because that's the *deployable solution*. The bench asks "can today's tools redact PII from screen telemetry?" — a small in-distribution detector is a legitimate answer. The 90-point gap vs frontier vision is load-bearing; the absolute 98.9 % is bounded by in-distribution status. Frontier models / GCP DLP / Presidio were *not* trained on this distribution — they're the genuine zero-shot baseline.
-
-**"Why three sub-benches?"** Because the failure modes separate. A model can ace text-PII at 91 % and leak in 80 % of traces. Single-bench framings miss the gap.
-
-**"How do labs / red teams get the full corpus?"** Email `louis@screenpi.pe` with a one-paragraph use case. Signed access agreement: (a) corpus is for evaluation, not training; (b) you share back any published results so the leaderboard stays honest. No fee.
 
 ## What this is not
 
